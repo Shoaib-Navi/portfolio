@@ -1,5 +1,7 @@
 # Mohd Shoaib — Portfolio
 
+Live: https://mohd-shoaib.vercel.app
+
 Next.js + TypeScript + plain CSS. No other runtime dependencies.
 
 ## Run
@@ -80,4 +82,5 @@ src/
 
 ## Deploy
 
-Push to GitHub and import the repo on Vercel. Add `NEXT_PUBLIC_SITE_URL` in the project settings.
+Hosted on Vercel and connected to this repository: pushes to `main` deploy automatically.
+`npx vercel --prod` deploys the working tree without a push.
