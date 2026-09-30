@@ -8,10 +8,11 @@ import { fetchDevicon, searchDevicon, type DeviconHit } from "@/lib/admin/devico
 import { adminEnv, authConfigured } from "@/lib/admin/env";
 import { checkSvg, expectKind, LIMITS, safeName, stamp, webpSize } from "@/lib/admin/files";
 import { verifyPassword } from "@/lib/admin/password";
+import { assetUsage } from "@/lib/admin/usage";
 import { clearFailures, recordFailure, retryAfter } from "@/lib/admin/rate-limit";
 import { extractPdfText, resumeChecks } from "@/lib/admin/resume";
 import { createSessionToken, SESSION_COOKIE, SESSION_TTL_S } from "@/lib/admin/session";
-import { encodeCollection, getStore, readCollection, StoreError, type Change } from "@/lib/admin/store";
+import { encodeCollection, getStore, readCollection, StoreError, type Change, type DeployState } from "@/lib/admin/store";
 import { COLLECTIONS, collectionPath, isCollection, validate, type Issue, type ResumeVersion } from "@/lib/content/schema";
 
 export type Result<T = null> = { ok: true; data: T } | { ok: false; error: string; issues?: Issue[] };
@@ -141,21 +142,9 @@ export async function uploadLogo(form: FormData): Promise<Result<string>> {
   });
 }
 
-/** Files under /public the content still points at. */
-async function referencedAssets(): Promise<Set<string>> {
-  const store = getStore();
-  const refs = new Set<string>();
-  for (const name of COLLECTIONS) {
-    const raw = await store.read(collectionPath(name));
-    if (!raw) continue;
-    for (const m of new TextDecoder().decode(raw).matchAll(/"(\/(?:logos|shots|pfp|resumes)\/[^"]+)"/g)) refs.add(m[1]);
-  }
-  return refs;
-}
-
 export async function deleteAsset(publicPath: string): Promise<Result> {
   return act(async () => {
-    if ((await referencedAssets()).has(publicPath)) throw new StoreError(`${publicPath} is still in use`);
+    if ((await assetUsage(getStore())).has(publicPath)) throw new StoreError(`${publicPath} is still in use`);
     await getStore().stage([{ path: `public${publicPath}`, content: null }], `delete ${publicPath}`);
     return null;
   });
@@ -252,4 +241,14 @@ export async function discardAction(): Promise<Result> {
 export async function rollbackAction(sha: string): Promise<Result<{ sha: string | null; skipped: string[] }>> {
   if (!/^[0-9a-f]{7,40}$/.test(sha)) return { ok: false, error: "Invalid commit" };
   return act(() => getStore().rollback(sha));
+}
+
+export async function deployStatusAction(sha: string): Promise<Result<DeployState>> {
+  if (!/^[0-9a-f]{7,40}$/.test(sha)) return { ok: false, error: "Invalid commit" };
+  try {
+    await requireAdmin();
+    return { ok: true, data: await getStore().deployState(sha) };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Status unavailable" };
+  }
 }

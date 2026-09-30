@@ -69,8 +69,16 @@ export class GitHubStore implements Store {
   }
 
   async read(path: RepoPath) {
+    return this.readAt(path, await this.viewRef());
+  }
+
+  async readLive(path: RepoPath) {
+    return this.readAt(path, this.branch);
+  }
+
+  private async readAt(path: RepoPath, ref: string) {
     try {
-      return await this.api<Uint8Array>(`/contents/${encodePath(path)}?ref=${await this.viewRef()}`, { raw: true });
+      return await this.api<Uint8Array>(`/contents/${encodePath(path)}?ref=${encodeURIComponent(ref)}`, { raw: true });
     } catch (e) {
       if ((e as { status?: number }).status === 404) return null;
       throw e;

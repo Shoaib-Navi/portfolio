@@ -61,6 +61,10 @@ export class LocalStore implements Store {
     return (await readOrNull(abs(DRAFT, p))) ?? readOrNull(abs(ROOT, p));
   }
 
+  async readLive(p: RepoPath) {
+    return readOrNull(abs(ROOT, p));
+  }
+
   async list(dir: RepoPath) {
     const names = new Set<string>();
     const deleted = await deletedSet();

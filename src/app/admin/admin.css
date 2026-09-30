@@ -703,6 +703,12 @@ html:has(.adm) #cursor {
   color: var(--bad);
 }
 
+.adm .field > label.check {
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .adm .check {
   display: flex;
   align-items: flex-start;
@@ -1118,6 +1124,11 @@ html:has(.adm) #cursor {
   border: var(--bw) solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
+}
+
+.adm-savebar--inline {
+  position: static;
+  box-shadow: none;
 }
 
 .adm-savebar[data-dirty="1"] {

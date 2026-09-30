@@ -202,15 +202,18 @@ export function SaveBar({
   onSave,
   onReset,
   label = "Save draft",
+  inline,
 }: {
   dirty: boolean;
   saving: boolean;
   onSave: () => void;
   onReset: () => void;
   label?: string;
+  /** Inside a small card: sits at the end instead of sticking to the viewport. */
+  inline?: boolean;
 }) {
   return (
-    <div className="adm-savebar" data-dirty={dirty ? "1" : undefined}>
+    <div className={`adm-savebar${inline ? " adm-savebar--inline" : ""}`} data-dirty={dirty ? "1" : undefined}>
       <span className="muted">{saving ? "Saving…" : dirty ? "Unsaved changes" : "All changes saved to the draft"}</span>
       <div className="adm-actions">
         <button type="button" className="btn btn--ghost" onClick={onReset} disabled={!dirty || saving}>

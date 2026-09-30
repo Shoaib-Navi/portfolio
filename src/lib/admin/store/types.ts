@@ -10,6 +10,8 @@ export interface Store {
   readonly mode: "github" | "local";
   /** The admin's view: pending draft edits layered over the live branch. */
   read(path: RepoPath): Promise<Uint8Array | null>;
+  /** The file as it is on the live branch, ignoring the draft. */
+  readLive(path: RepoPath): Promise<Uint8Array | null>;
   /** File names (not paths) directly inside a folder, in the draft view. */
   list(dir: RepoPath): Promise<string[]>;
   /** Record edits in the draft. Nothing reaches the live site until publish(). */

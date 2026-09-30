@@ -197,8 +197,8 @@ export const projectsV: V<Project[]> = arr(
     slug,
     name: str({ max: 60 }),
     tagline: str({ max: 100 }),
-    lede: str({ max: 400 }),
     status: opt(str({ max: 40 })),
+    lede: str({ max: 400 }),
     stack: arr(str({ max: 40 }), { max: 20 }),
     points: arr(obj<ProjectPoint>({ label: str({ max: 40 }), text: text(500) }), { min: 1, max: 10 }),
     links: arr(obj({ label: str({ max: 20 }), href: https }), { max: 4 }),
@@ -247,7 +247,11 @@ function uniqueBy<T>(list: T[], key: (t: T) => string, path: string, what: strin
 type Refine<T> = (value: T, issues: Issue[]) => void;
 
 const refinements: { [K in keyof Collections]?: Refine<Collections[K]> } = {
-  projects: (list, issues) => uniqueBy(list, (p) => p.slug, "", "slug", issues),
+  projects: (list, issues) => {
+    uniqueBy(list, (p) => p.slug, "", "slug", issues);
+    // /admin/projects/new is the "add project" route.
+    list.forEach((p, i) => p.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
+  },
   experience: (list, issues) => uniqueBy(list, (j) => j.slug, "", "slug", issues),
   skills: (groups, issues) => {
     uniqueBy(groups, (g) => g.label, "", "group", issues);
