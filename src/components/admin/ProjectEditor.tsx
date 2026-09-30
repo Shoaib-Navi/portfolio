@@ -6,7 +6,7 @@ import { useRef, useState, useTransition } from "react";
 import { deleteAsset, saveCollection } from "@/app/admin/actions";
 import ProjectArticle from "@/components/ProjectArticle";
 import { adminSrc } from "@/lib/admin/paths";
-import type { Project, Tool } from "@/lib/content/schema";
+import type { CaseSection, Project, Tool } from "@/lib/content/schema";
 import { ChipInput } from "./ChipInput";
 import { Checkbox, IssueList, RestoreBanner, RichField, SaveBar, TextField } from "./fields";
 import { ListField } from "./ListField";
@@ -209,6 +209,58 @@ export function ProjectEditor({
                   </>
                 )}
               />
+            </section>
+            <section className="card">
+              <div className="card__head">
+                <h2>Case study</h2>
+                <p>Long-form sections shown under “What it does”. Markdown: ## / ### headings, - lists, **bold**, `code`, [links](https://…).</p>
+              </div>
+              {p.caseStudy ? (
+                <>
+                  <Checkbox
+                    label="Case study verified"
+                    hint="Until ticked it's a draft: visible here and in npm run dev, never on the live site."
+                    checked={p.caseStudy.verified}
+                    onChange={(verified) => set({ caseStudy: { ...p.caseStudy!, verified } })}
+                  />
+                  <ListField
+                    label="Sections"
+                    items={p.caseStudy.sections}
+                    onChange={(sections) => set({ caseStudy: { ...p.caseStudy!, sections } })}
+                    blank={(): CaseSection => ({ heading: "", body: "" })}
+                    addLabel="+ Add section"
+                    max={12}
+                    render={(sec, update, i) => (
+                      <>
+                        <TextField label="Heading" value={sec.heading} onChange={(heading) => update({ ...sec, heading })} error={err(`caseStudy.sections[${i}].heading`)} max={60} />
+                        <RichField label="Body" value={sec.body} onChange={(body) => update({ ...sec, body })} error={err(`caseStudy.sections[${i}].body`)} rows={8} max={6000} />
+                        {p.caseStudy?.architecture ? (
+                          <Checkbox label="Show the architecture diagram after this section" checked={Boolean(sec.diagram)} onChange={(diagram) => update({ ...sec, diagram: diagram || undefined })} />
+                        ) : null}
+                      </>
+                    )}
+                  />
+                  {p.caseStudy.architecture ? <p className="muted">The diagram’s boxes are edited in content/projects.json.</p> : null}
+                  <button type="button" className="btn btn--sm btn--ghost btn--danger" onClick={() => set({ caseStudy: undefined })}>
+                    Remove case study
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn--sm"
+                  onClick={() =>
+                    set({
+                      caseStudy: {
+                        verified: false,
+                        sections: ["Problem", "Approach", "Technical decisions", "Results", "Lessons learned"].map((heading) => ({ heading, body: "" })),
+                      },
+                    })
+                  }
+                >
+                  + Start a case study
+                </button>
+              )}
             </section>
             <section className="card">
               <Checkbox

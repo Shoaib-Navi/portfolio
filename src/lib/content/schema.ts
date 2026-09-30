@@ -122,6 +122,24 @@ export type Job = {
   verified: boolean;
 };
 export type ProjectPoint = { label: string; text: string };
+/** One box in an architecture diagram. */
+export type ArchNode = { label: string; detail?: string };
+export type ArchLayer = { label: string; nodes: ArchNode[] };
+/** Drawn top to bottom as the request path; `aside` holds things that run alongside it. */
+export type Architecture = { layers: ArchLayer[]; aside: ArchLayer[] };
+export type CaseSection = {
+  heading: string;
+  /** Markdown subset (see lib/markdown.tsx) */
+  body: string;
+  /** Show the architecture diagram at the end of this section */
+  diagram?: boolean;
+};
+export type CaseStudy = {
+  /** Unverified case studies are drafts: visible in dev and the admin, never in production. */
+  verified: boolean;
+  sections: CaseSection[];
+  architecture?: Architecture;
+};
 export type Project = {
   slug: string;
   name: string;
@@ -136,6 +154,7 @@ export type Project = {
   /** Screenshot paths under /public. Empty shows the "no screenshot yet" placeholder. */
   shots: string[];
   verified: boolean;
+  caseStudy?: CaseStudy;
 };
 export type Education = { title: string; org: string; detail: string };
 export type Award = { title: string; detail: string; href?: string; verified: boolean };
@@ -192,6 +211,17 @@ export const experienceV: V<Job[]> = arr(
   { max: 20 },
 );
 
+const archLayer: V<ArchLayer> = obj<ArchLayer>({
+  label: str({ max: 40 }),
+  nodes: arr(obj<ArchNode>({ label: str({ max: 60 }), detail: opt(str({ max: 120 })) }), { min: 1, max: 8 }),
+});
+
+const caseStudyV: V<CaseStudy> = obj<CaseStudy>({
+  verified: bool,
+  sections: arr(obj<CaseSection>({ heading: str({ max: 60 }), body: str({ max: 6000 }), diagram: opt(bool) }), { min: 1, max: 12 }),
+  architecture: opt(obj<Architecture>({ layers: arr(archLayer, { min: 1, max: 6 }), aside: arr(archLayer, { max: 4 }) })),
+});
+
 export const projectsV: V<Project[]> = arr(
   obj<Project>({
     slug,
@@ -205,6 +235,7 @@ export const projectsV: V<Project[]> = arr(
     note: opt(str({ max: 200 })),
     shots: arr(asset("shots", /webp/), { max: 8 }),
     verified: bool,
+    caseStudy: opt(caseStudyV),
   }),
   { max: 30 },
 );

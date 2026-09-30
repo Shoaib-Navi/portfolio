@@ -50,7 +50,112 @@
     "shots": [
       "/shots/carepulse.webp"
     ],
-    "verified": true
+    "verified": true,
+    "caseStudy": {
+      "verified": false,
+      "sections": [
+        {
+          "heading": "Problem",
+          "body": "Outpatient clinics run on a daily patient queue. One visit moves through registration, the live queue, vitals, consultation, lab orders and results, prescriptions and pharmacy dispensing, and each step belongs to a different person: receptionist, nurse, doctor, lab technician, pharmacist. CarePulse gives every role its own workflow on one shared patient record, for several clinics at once.\n\nThree things make that harder than a typical CRUD app:\n\n- **Concurrency.** Two receptionists registering patients at the same moment must never get the same queue token.\n- **Isolation.** Clinics share one database, and one clinic must never see another clinic's patients.\n- **Trust.** Clinical records can't be quietly overwritten, and every read of patient data has to be accountable."
+        },
+        {
+          "heading": "Approach",
+          "body": "CarePulse is built by a team of two: a Python backend on FastAPI and PostgreSQL, and a React and TypeScript front end.\n\nTests were part of the design from the first week rather than something added at the end. The goal was simple: if the suite passes, a clinic's day actually works, including the parts that only break under concurrent use."
+        },
+        {
+          "heading": "Architecture",
+          "diagram": true,
+          "body": "The API has **60 operations across 16 feature modules**, and every module is split the same way, so each new feature has an obvious home:\n\n- **Router**: the HTTP layer.\n- **Service**: the business rules.\n- **Repository**: data access through SQLAlchemy 2.0, with schema changes as Alembic migrations.\n\nPostgreSQL does more than store rows. It enforces tenant isolation, keeps clinical history append-only, and coordinates background work."
+        },
+        {
+          "heading": "Technical decisions",
+          "body": "### Isolate tenants in the database, not only in code\n\nAccess is checked twice: by a role-permission matrix in the application, and again by **PostgreSQL row-level security** per tenant. If application code ever forgets a filter, the database still returns only the current clinic's rows.\n\n### Make clinical history append-only\n\nClinical writes go to an **append-only ledger**, enforced by database triggers rather than by convention. Nothing is overwritten, which makes it possible to replay a record as it stood at any point in time.\n\n### Handle concurrency where it happens\n\nQueue tokens are issued under a lock with a **bounded retry**, so simultaneous sign-ups stay unique. The background job that updates overdue follow-ups takes a **PostgreSQL advisory lock**, so it is safe to rerun and safe to run on more than one worker.\n\n### Security basics, done completely\n\nJWT with refresh tokens, **argon2** password hashing, sign-in rate limiting that answers with Retry-After, and an **audit trail of every read of patient data**."
+        },
+        {
+          "heading": "Challenges",
+          "body": "### The commit that happened after the response\n\nA Playwright end-to-end run exposed a subtle bug: the database commit was running **after the HTTP response had been sent**. A client that refetched straight away could read stale data. The fix guarantees that every 2xx response means the write is committed, and a test now checks that for **every route**, so a new endpoint can't bring the bug back.\n\n### Proving search stays fast\n\nPatient search has to stay quick as a clinic's records grow. Instead of assuming it would, a latency test asserts that **95% of searches finish in under 300 ms with 50,000 patients**."
+        },
+        {
+          "heading": "Trade-offs",
+          "body": "- **Row-level security fails quietly.** A missing policy shows up as \"no rows\", not as an error, which is why dedicated security tests matter as much as the policies themselves.\n- **Full history costs storage.** An append-only ledger keeps every change, so it grows faster than a table that is updated in place, and reading the current state takes more work.\n- **A bounded retry can run out.** Under extreme contention a registration can fail after its retries; the design prefers a clear error to a duplicate queue token.\n- **Real databases make tests slower.** Integration tests run against a real PostgreSQL, and CI starts a throwaway database per job. Slower runs are the price of testing what production actually does."
+        },
+        {
+          "heading": "Results",
+          "body": "- **60 REST API operations** across 16 feature modules, covering six staff roles.\n- **155 pytest tests**: 25 unit, 86 integration on real PostgreSQL and 44 security, plus Hypothesis property tests and Playwright end-to-end runs.\n- **p95 patient search under 300 ms** with 50,000 patients, asserted by a test.\n- Every push runs pytest, ruff, strict mypy, ESLint, dependency audits and Docker builds in **GitHub Actions**.\n\nCarePulse is still in progress, and the repository is private."
+        },
+        {
+          "heading": "Lessons learned",
+          "body": "- People trust internal tools because of **permissions, audit trails and reliability**, not only features.\n- Testing is how I find out whether a design really works. The most useful bug here was found by a test, not by reading the code.\n- Look for where a system breaks rather than where it works. It's a habit from evaluating LLM responses at Ethara AI, and it applies to APIs just as well."
+        }
+      ],
+      "architecture": {
+        "layers": [
+          {
+            "label": "Client",
+            "nodes": [
+              {
+                "label": "React + TypeScript",
+                "detail": "A workflow per staff role"
+              }
+            ]
+          },
+          {
+            "label": "API · FastAPI",
+            "nodes": [
+              {
+                "label": "Routers",
+                "detail": "60 operations, 16 modules"
+              },
+              {
+                "label": "Services",
+                "detail": "Business rules"
+              },
+              {
+                "label": "Repositories",
+                "detail": "SQLAlchemy 2.0"
+              }
+            ]
+          },
+          {
+            "label": "PostgreSQL",
+            "nodes": [
+              {
+                "label": "Row-level security",
+                "detail": "Isolates each clinic"
+              },
+              {
+                "label": "Append-only ledger",
+                "detail": "Trigger-enforced history"
+              },
+              {
+                "label": "Advisory locks",
+                "detail": "Coordinate background jobs"
+              }
+            ]
+          }
+        ],
+        "aside": [
+          {
+            "label": "Background job",
+            "nodes": [
+              {
+                "label": "Overdue follow-ups",
+                "detail": "Safe to rerun, several workers"
+              }
+            ]
+          },
+          {
+            "label": "CI · GitHub Actions",
+            "nodes": [
+              {
+                "label": "Throwaway PostgreSQL per job",
+                "detail": "pytest, ruff, strict mypy, ESLint, audits, Docker builds"
+              }
+            ]
+          }
+        ]
+      }
+    }
   },
   {
     "slug": "hirestream",
