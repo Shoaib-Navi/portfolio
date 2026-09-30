@@ -10,3 +10,6 @@ next-env.d.ts
 refrence/
 
 .vercel
+
+# admin drafts in local dev (see src/lib/admin/store/local.ts)
+.admin-draft/
