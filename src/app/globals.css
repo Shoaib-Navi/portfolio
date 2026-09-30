@@ -1773,6 +1773,178 @@ body {
   border-left: 4px solid var(--accent);
 }
 
+/* ============================ Command palette ============================ */
+/* Between the drawer breakpoint and ~1000px the full nav, search, theme and résumé
+   buttons are tight: trim link padding and shorten the résumé label so nothing clips. */
+@media (min-width: 821px) and (max-width: 1000px) {
+  .site .bar {
+    gap: 0.6rem;
+  }
+
+  .site .bar nav a {
+    padding-inline: 0.55rem;
+  }
+
+  .site .bar__cta .long {
+    display: none;
+  }
+}
+
+/* Search and theme sit together; only the first may push away from the links. */
+.site .search-btn + .themepick {
+  margin-left: 0;
+}
+
+.site .palette {
+  width: min(640px, calc(100vw - 2rem));
+  max-height: min(560px, calc(100dvh - 4rem));
+  margin: min(12vh, 6rem) auto auto;
+  padding: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  overflow: visible;
+}
+
+.site .palette::backdrop {
+  background: color-mix(in srgb, #000 45%, transparent);
+}
+
+.site .palette[open] {
+  animation: palette-in 0.16s var(--ease-out);
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.site .palette__box {
+  display: flex;
+  flex-direction: column;
+  max-height: min(560px, calc(100dvh - 4rem));
+  overflow: hidden;
+  background: var(--surface);
+  border: var(--bw) solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-hard-lg);
+}
+
+.site .palette__search {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.35rem 1rem;
+  color: var(--ink-subtle);
+  border-bottom: var(--bw) solid var(--border);
+}
+
+.site .palette__input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  font: inherit;
+  font-size: 1.0625rem;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+
+.site .palette__input::placeholder {
+  color: var(--ink-subtle);
+}
+
+.site .palette kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.05rem 0.4rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--ink-muted);
+  background: var(--canvas-base);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  border-radius: 6px;
+}
+
+.site .palette__list {
+  flex: 1;
+  min-height: 0;
+  padding: 0.4rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.site .palette__group {
+  padding: 0.7rem 0.75rem 0.3rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.site .palette__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.site .palette__item[aria-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  border-color: var(--border);
+}
+
+.site .palette__label {
+  font-weight: 600;
+  min-width: 0;
+}
+
+.site .palette__hint {
+  min-width: 0;
+  font-size: 0.8125rem;
+  color: var(--ink-subtle);
+  overflow-wrap: anywhere;
+}
+
+.site .palette__empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--ink-subtle);
+}
+
+.site .palette__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.75rem;
+  color: var(--ink-subtle);
+  border-top: 1.5px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+@media (max-width: 560px) {
+  .site .palette {
+    margin-top: 1rem;
+  }
+
+  /* No physical keyboard hints on phones. */
+  .site .palette__foot,
+  .site .palette__esc {
+    display: none;
+  }
+}
+
 /* ============================ Project status ============================ */
 .site .health {
   display: grid;

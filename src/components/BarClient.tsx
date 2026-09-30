@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import { OPEN_PALETTE } from "./CommandPalette";
 import { useScrollPast } from "@/lib/useScrollPast";
 
 export type NavItem = { href: string; label: string };
@@ -68,6 +69,19 @@ export default function BarClient({
           ))}
         </nav>
       )}
+
+      <button
+        type="button"
+        className="themepick search-btn"
+        aria-label="Search the site (Ctrl K)"
+        title="Search (Ctrl K / ⌘K)"
+        onClick={() => window.dispatchEvent(new Event(OPEN_PALETTE))}
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" strokeLinecap="round" />
+        </svg>
+      </button>
 
       <ThemeToggle />
 
