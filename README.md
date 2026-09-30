@@ -51,7 +51,7 @@ you press **Publish**, which writes every pending change as one commit.
    this repo only, *Contents: read and write*, optionally *Commit statuses: read*) and `GITHUB_REPO`.
 
 **Rules it enforces**: entries marked unverified never reach the site; slugs are unique and locked
-once live; links must be https; images are converted to WebP in the browser (portrait 3:4,
+once live; links must be https; images are converted to WebP in the browser (portrait 4:5 like the About section,
 screenshots max 1600px wide); logos come from devicon or an uploaded SVG, which is rejected if it
 contains scripts, event handlers or external references. The live résumé is always served at
 `/resume.pdf`; the résumé page flags a phone number, a missing text layer, and claims that disagree

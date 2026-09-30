@@ -1002,14 +1002,12 @@ html:has(.adm) #cursor {
   border-top: 1.5px solid var(--border);
 }
 
-.adm .portrait {
-  width: 100%;
-  max-width: 240px;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border: var(--bw) solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
+/* Hosts the site's .portrait markup: same width it gets in the About column on desktop
+   (measured 386px at 1440px), and the site's page background behind it. */
+.adm .photo-preview {
+  width: min(100%, 392px); /* 386px photo + 6px room for its shadow */
+  padding: 0 6px 6px 0;
+  background: transparent;
 }
 
 .adm .cropper {

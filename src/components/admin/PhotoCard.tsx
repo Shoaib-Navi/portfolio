@@ -7,10 +7,11 @@ import { adminSrc } from "@/lib/admin/paths";
 import { cropAround, formWith, kb, loadImage, toWebp } from "./image";
 import { useToast } from "./Toasts";
 
-const ASPECT = 3 / 4;
+// Must match `.site .portrait` in globals.css (aspect-ratio: 4 / 5, object-fit: cover).
+const ASPECT = 4 / 5;
 const WIDTH = 720;
 
-/** Portrait: pick an image, click the face to set the focal point, save as a 3:4 WebP. */
+/** Portrait: pick an image, click the face to set the focal point, save as a 4:5 WebP. */
 export function PhotoCard({ photo }: { photo: { src: string; width: number; height: number } }) {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [focus, setFocus] = useState({ x: 0.5, y: 0.4 });
@@ -57,11 +58,17 @@ export function PhotoCard({ photo }: { photo: { src: string; width: number; heig
     <section className="card">
       <div className="card__head">
         <h2>Photo</h2>
-        <p>Shown in the hero at 3:4. Saved as WebP, {WIDTH}px wide.</p>
+        <p>Exactly as the About section shows it: a 4:5 frame, about 386px wide on desktop.</p>
       </div>
-      <img className="portrait" src={adminSrc(photo.src)} alt="Current portrait" width={photo.width} height={photo.height} />
-      <p className="muted" style={{ margin: "10px 0" }}>
+      {/* The site's own markup and classes, so the frame, crop and shadow are identical. */}
+      <div className="site photo-preview">
+        <div className="portrait">
+          <img src={adminSrc(photo.src)} alt="Current portrait" width={photo.width} height={photo.height} />
+        </div>
+      </div>
+      <p className="muted" style={{ margin: "14px 0 10px" }}>
         {photo.src} · {photo.width}×{photo.height}
+        {Math.abs(photo.width / photo.height - ASPECT) > 0.01 ? " · not 4:5, so the site trims the edges as shown" : ""}
       </p>
       <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => pick(e.target.files?.[0])} />
       <button type="button" className="btn" onClick={() => input.current?.click()}>
@@ -73,7 +80,7 @@ export function PhotoCard({ photo }: { photo: { src: string; width: number; heig
           Position the crop
         </h2>
         <p className="muted" style={{ marginBottom: 12 }}>
-          Click where the face is; the 3:4 frame centres on that point.
+          Click where the face is; the 4:5 frame (the shape the site shows) centres on that point.
         </p>
         {img && crop ? (
           <div
