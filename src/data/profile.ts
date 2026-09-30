@@ -8,6 +8,7 @@ import awardsJson from "../../content/awards.json";
 import educationJson from "../../content/education.json";
 import experienceJson from "../../content/experience.json";
 import profileJson from "../../content/profile.json";
+import notesJson from "../../content/notes.json";
 import practicesJson from "../../content/practices.json";
 import projectsJson from "../../content/projects.json";
 import skillsJson from "../../content/skills.json";
@@ -43,5 +44,14 @@ export const practices = verifiedOnly(parseOrThrow("practices", practicesJson)).
     return { ...e, label: project.name, href: `/work/${project.slug}` };
   }),
 }));
+/** Technical notes, newest first. Drafts (unverified) show only in development. */
+export const notes = parseOrThrow("notes", notesJson)
+  .filter((n) => n.verified || SHOW_DRAFTS)
+  .map((n) => {
+    const project = n.project ? projects.find((p) => p.slug === n.project) : undefined;
+    if (n.project && !project) throw new Error(`content/notes.json: "${n.slug}" links to unknown project "${n.project}"`);
+    return { ...n, projectName: project?.name };
+  })
+  .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title));
 export const education = parseOrThrow("education", educationJson);
 export const awards = verifiedOnly(parseOrThrow("awards", awardsJson));

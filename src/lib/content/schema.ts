@@ -157,6 +157,20 @@ export type Project = {
   caseStudy?: CaseStudy;
 };
 export type Education = { title: string; org: string; detail: string };
+export type Note = {
+  slug: string;
+  title: string;
+  summary: string;
+  /** YYYY-MM-DD */
+  date: string;
+  tags: string[];
+  /** Slug of the project the note comes from, if any */
+  project?: string;
+  /** Markdown subset (see lib/markdown.tsx) */
+  body: string;
+  /** Unverified notes are drafts: visible in dev and the admin, never in production. */
+  verified: boolean;
+};
 /** A concrete, checkable example of a practice. `source` is a project slug, or "site" for this portfolio. */
 export type Evidence = { text: string; source: string };
 export type Practice = { area: string; summary: string; evidence: Evidence[]; verified: boolean };
@@ -256,6 +270,20 @@ export const practicesV: V<Practice[]> = arr(
   { max: 12 },
 );
 
+export const notesV: V<Note[]> = arr(
+  obj<Note>({
+    slug,
+    title: str({ max: 100 }),
+    summary: str({ max: 280 }),
+    date: str({ pattern: /^\d{4}-\d{2}-\d{2}$/, patternMsg: "YYYY-MM-DD" }),
+    tags: arr(str({ max: 24 }), { max: 6 }),
+    project: opt(slug),
+    body: str({ min: 50, max: 30000 }),
+    verified: bool,
+  }),
+  { max: 100 },
+);
+
 export const educationV: V<Education[]> = arr(
   obj<Education>({ title: str({ max: 80 }), org: str({ max: 120 }), detail: str({ max: 120 }) }),
   { max: 6 },
@@ -301,6 +329,11 @@ const refinements: { [K in keyof Collections]?: Refine<Collections[K]> } = {
   },
   experience: (list, issues) => uniqueBy(list, (j) => j.slug, "", "slug", issues),
   practices: (list, issues) => uniqueBy(list, (p) => p.area, "", "area", issues),
+  notes: (list, issues) => {
+    uniqueBy(list, (n) => n.slug, "", "slug", issues);
+    // /admin/notes/new is the "add note" route.
+    list.forEach((n, i) => n.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
+  },
   skills: (groups, issues) => {
     uniqueBy(groups, (g) => g.label, "", "group", issues);
     uniqueBy(
@@ -326,6 +359,7 @@ export type Collections = {
   experience: Job[];
   projects: Project[];
   practices: Practice[];
+  notes: Note[];
   education: Education[];
   awards: Award[];
   resumes: Resumes;
@@ -339,6 +373,7 @@ const validators: { [K in CollectionName]: V<Collections[K]> } = {
   experience: experienceV,
   projects: projectsV,
   practices: practicesV,
+  notes: notesV,
   education: educationV,
   awards: awardsV,
   resumes: resumesV,

@@ -31,6 +31,13 @@ describe("markdown subset", () => {
     expect(out).toContain("bad");
   });
 
+  it("formats inside bold, supports italics, and leaves lone asterisks alone", () => {
+    const out = renderToStaticMarkup(<p>{inline("**roles with `BYPASSRLS` ignore it** and *one* query; 2 * 3 * 4")}</p>);
+    expect(out).toContain("<strong>roles with <code>BYPASSRLS</code> ignore it</strong>");
+    expect(out).toContain("<em>one</em>");
+    expect(out).toContain("2 * 3 * 4");
+  });
+
   it("escapes raw HTML instead of rendering it", () => {
     const out = html('<script>alert(1)</script>\n\n<img src=x onerror="alert(1)">');
     expect(out).not.toContain("<script>");

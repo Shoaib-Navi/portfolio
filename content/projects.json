@@ -85,7 +85,7 @@
         },
         {
           "heading": "Lessons learned",
-          "body": "- People trust internal tools because of **permissions, audit trails and reliability**, not only features.\n- Testing is how I find out whether a design really works. The most useful bug here was found by a test, not by reading the code.\n- Look for where a system breaks rather than where it works. It's a habit from evaluating LLM responses at Ethara AI, and it applies to APIs just as well."
+          "body": "- People trust internal tools because of **permissions, audit trails and reliability**, not only features.\n- Testing is how I find out whether a design really works. A subtle bug here was found by a Playwright run, not by reading the code.\n- Look for where a system breaks rather than where it works. It's a habit from evaluating LLM responses at Ethara AI, and it applies to APIs just as well."
         }
       ],
       "architecture": {

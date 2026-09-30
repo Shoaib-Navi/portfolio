@@ -4,7 +4,7 @@ import { Fragment, type ReactNode } from "react";
 // elements (never raw HTML), so content can't inject markup or scripts.
 //
 // Blocks:  ## / ### headings · paragraphs · "- " or "1. " lists · > quotes · ``` code fences
-// Inline:  **bold** · `code` · [text](https://… or /path)
+// Inline:  **bold** · *italic* · `code` · [text](https://… or /path)
 
 export type Heading = { id: string; text: string; level: 2 | 3 };
 
@@ -84,28 +84,30 @@ export function parseBlocks(src: string): Block[] {
 
 const SAFE_HREF = /^(https:\/\/|\/(?!\/)|#)/;
 
-/** Inline formatting: **bold**, `code`, [text](href). Everything else is plain text. */
+/** Inline formatting: **bold**, *italic*, `code`, [text](href). Everything else is plain text. */
 export function inline(text: string, keyBase = "i"): ReactNode[] {
   const out: ReactNode[] = [];
-  const re = /(\*\*([^*]+)\*\*)|(`([^`]+)`)|(\[([^\]]+)\]\(([^)\s]+)\))/g;
+  // Code first so its contents are never formatted; bold before italic so ** isn't read as *.
+  const re = /(`([^`]+)`)|(\*\*(.+?)\*\*)|(\*([^*\s](?:[^*]*[^*\s])?)\*)|(\[([^\]]+)\]\(([^)\s]+)\))/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let k = 0;
   while ((m = re.exec(text))) {
     if (m.index > last) out.push(text.slice(last, m.index));
     const key = `${keyBase}-${k++}`;
-    if (m[2] !== undefined) out.push(<strong key={key}>{m[2]}</strong>);
-    else if (m[4] !== undefined) out.push(<code key={key}>{m[4]}</code>);
-    else if (m[6] !== undefined) {
-      const href = m[7];
+    if (m[2] !== undefined) out.push(<code key={key}>{m[2]}</code>);
+    else if (m[4] !== undefined) out.push(<strong key={key}>{inline(m[4], key)}</strong>);
+    else if (m[6] !== undefined) out.push(<em key={key}>{inline(m[6], key)}</em>);
+    else if (m[8] !== undefined) {
+      const href = m[9];
       if (SAFE_HREF.test(href)) {
         const external = href.startsWith("https://");
         out.push(
           <a key={key} href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
-            {m[6]}
+            {inline(m[8], key)}
           </a>,
         );
-      } else out.push(m[6]);
+      } else out.push(m[8]);
     }
     last = re.lastIndex;
   }

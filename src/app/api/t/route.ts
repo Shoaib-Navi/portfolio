@@ -1,4 +1,4 @@
-import { projects } from "@/data/profile";
+import { notes, projects } from "@/data/profile";
 import { readSessionToken, SESSION_COOKIE } from "@/lib/admin/session";
 import { dayOf, deviceOf, getAnalytics, isBot, sourceOf, visitorHash, type Hit } from "@/lib/analytics";
 
@@ -6,8 +6,8 @@ import { dayOf, deviceOf, getAnalytics, isBot, sourceOf, visitorHash, type Hit }
 // navigator.sendBeacon). Everything is validated here; unknown paths, bots, the site
 // owner's own visits and malformed payloads are dropped silently with 204.
 
-const SECTIONS = ["/", "/about", "/skills", "/experience", "/contact", "/work"];
-const known = new Set([...SECTIONS, ...projects.map((p) => `/work/${p.slug}`)]);
+const SECTIONS = ["/", "/about", "/skills", "/experience", "/engineering", "/contact", "/work", "/notes"];
+const known = new Set([...SECTIONS, ...projects.map((p) => `/work/${p.slug}`), ...notes.map((n) => `/notes/${n.slug}`)]);
 const done = () => new Response(null, { status: 204 });
 
 type Payload = { k?: string; p?: string; r?: string; ref?: string; land?: boolean; to?: string };
