@@ -1091,6 +1091,81 @@ body {
   text-underline-offset: 3px;
 }
 
+/* ============================ Engineering ============================ */
+/* Balanced columns: cards keep their natural height instead of stretching to the
+   tallest card in a row, so uneven evidence lists leave no empty boxes. */
+.site .practices {
+  columns: 3 300px;
+  column-gap: 1.25rem;
+}
+
+.site .practice {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-bottom: 1.25rem;
+  break-inside: avoid;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  background: var(--surface);
+  border: var(--bw) solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-hard);
+}
+
+.site .practice h3 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.site .practice__sum {
+  margin-top: 0.6rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.site .practice ul {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+.site .practice li {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 1rem;
+  border-top: 1.5px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+.site .practice li p {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+
+.site .practice li strong {
+  color: var(--ink);
+}
+
+.site .practice__src {
+  justify-self: start;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.site .practice__src--plain {
+  font-weight: 500;
+  color: var(--ink-subtle);
+  text-decoration: none;
+}
+
 /* ============================ Closer ============================ */
 .site .closer {
   position: relative;

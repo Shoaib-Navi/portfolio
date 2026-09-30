@@ -157,6 +157,9 @@ export type Project = {
   caseStudy?: CaseStudy;
 };
 export type Education = { title: string; org: string; detail: string };
+/** A concrete, checkable example of a practice. `source` is a project slug, or "site" for this portfolio. */
+export type Evidence = { text: string; source: string };
+export type Practice = { area: string; summary: string; evidence: Evidence[]; verified: boolean };
 export type Award = { title: string; detail: string; href?: string; verified: boolean };
 export type ResumeChecks = { pages: number; bytes: number; phone: boolean; textLayer: boolean };
 export type ResumeVersion = { id: string; label: string; file: string; uploadedAt: string; checks: ResumeChecks };
@@ -240,6 +243,19 @@ export const projectsV: V<Project[]> = arr(
   { max: 30 },
 );
 
+export const practicesV: V<Practice[]> = arr(
+  obj<Practice>({
+    area: str({ max: 30 }),
+    summary: str({ max: 200 }),
+    evidence: arr(obj<Evidence>({ text: text(300), source: str({ max: 60, pattern: SLUG, patternMsg: "A project slug or “site”" }) }), {
+      min: 1,
+      max: 6,
+    }),
+    verified: bool,
+  }),
+  { max: 12 },
+);
+
 export const educationV: V<Education[]> = arr(
   obj<Education>({ title: str({ max: 80 }), org: str({ max: 120 }), detail: str({ max: 120 }) }),
   { max: 6 },
@@ -284,6 +300,7 @@ const refinements: { [K in keyof Collections]?: Refine<Collections[K]> } = {
     list.forEach((p, i) => p.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
   },
   experience: (list, issues) => uniqueBy(list, (j) => j.slug, "", "slug", issues),
+  practices: (list, issues) => uniqueBy(list, (p) => p.area, "", "area", issues),
   skills: (groups, issues) => {
     uniqueBy(groups, (g) => g.label, "", "group", issues);
     uniqueBy(
@@ -308,6 +325,7 @@ export type Collections = {
   skills: SkillGroup[];
   experience: Job[];
   projects: Project[];
+  practices: Practice[];
   education: Education[];
   awards: Award[];
   resumes: Resumes;
@@ -320,6 +338,7 @@ const validators: { [K in CollectionName]: V<Collections[K]> } = {
   skills: skillsV,
   experience: experienceV,
   projects: projectsV,
+  practices: practicesV,
   education: educationV,
   awards: awardsV,
   resumes: resumesV,

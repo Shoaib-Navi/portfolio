@@ -8,6 +8,7 @@ import awardsJson from "../../content/awards.json";
 import educationJson from "../../content/education.json";
 import experienceJson from "../../content/experience.json";
 import profileJson from "../../content/profile.json";
+import practicesJson from "../../content/practices.json";
 import projectsJson from "../../content/projects.json";
 import skillsJson from "../../content/skills.json";
 import statsJson from "../../content/stats.json";
@@ -31,5 +32,16 @@ export const projects: (Project & { index: string })[] = verifiedOnly(parseOrThr
     ...(caseStudy && (caseStudy.verified || SHOW_DRAFTS) ? { caseStudy } : {}),
   }),
 );
+/** Engineering practices; each piece of evidence points at a project (or "site"). */
+export const practices = verifiedOnly(parseOrThrow("practices", practicesJson)).map((p) => ({
+  ...p,
+  evidence: p.evidence.map((e) => {
+    if (e.source === "site") return { ...e, label: "This site", href: undefined };
+    const project = projects.find((x) => x.slug === e.source);
+    // A typo'd or unpublished project would leave a dangling link; fail the build instead.
+    if (!project) throw new Error(`content/practices.json: evidence source "${e.source}" is not a published project`);
+    return { ...e, label: project.name, href: `/work/${project.slug}` };
+  }),
+}));
 export const education = parseOrThrow("education", educationJson);
 export const awards = verifiedOnly(parseOrThrow("awards", awardsJson));
