@@ -75,6 +75,7 @@ export function safeName(input: string, fallback = "file"): string {
     .toLowerCase()
     .replace(/\.[a-z0-9]+$/, "")
     .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 40);

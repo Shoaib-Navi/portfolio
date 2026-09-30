@@ -41,5 +41,6 @@ export function lineDiff(before: string, after: string, context = 2, maxLines = 
       out.push(l);
     } else skipped++;
   });
+  if (skipped && out.length) out.push({ kind: "gap", text: `… ${skipped} unchanged line${skipped === 1 ? "" : "s"}` });
   return out;
 }

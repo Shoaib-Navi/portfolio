@@ -23,10 +23,8 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/admin/:path*",
-        headers: [
-          { key: "X-Robots-Tag", value: "noindex, nofollow" },
-          { key: "Cache-Control", value: "private, no-store" },
-        ],
+        // Admin pages are dynamic, so Next already sends them with no-store.
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },

@@ -57,6 +57,8 @@ export class LocalStore implements Store {
   }
 
   async read(p: RepoPath) {
+    // On Vercel the repo files aren't on disk (content is bundled into the build).
+    if (process.env.VERCEL) throw new StoreError("The admin needs GITHUB_TOKEN and GITHUB_REPO on this deployment.");
     if ((await deletedSet()).has(p)) return null;
     return (await readOrNull(abs(DRAFT, p))) ?? readOrNull(abs(ROOT, p));
   }

@@ -169,7 +169,7 @@ export class GitHubStore implements Store {
         ? [entry, { path: f.previous_filename, mode: "100644", type: "blob", sha: null }]
         : [entry];
     });
-    const sha = await this.commitTree(live, entries, message);
+    const sha = await this.commitTree(live, await this.dropMissingDeletes(entries, live), message);
     // force:false makes GitHub refuse if main moved between our read and this write.
     await this.api(`/git/refs/heads/${this.branch}`, { method: "PATCH", body: JSON.stringify({ sha, force: false }) });
     await this.discard();
@@ -182,6 +182,23 @@ export class GitHubStore implements Store {
     } catch (e) {
       if ((e as { status?: number }).status !== 404 && (e as { status?: number }).status !== 422) throw e;
     }
+  }
+
+  private async blobSha(path: RepoPath, ref: string): Promise<string | null> {
+    try {
+      return (await this.api<{ sha: string }>(`/contents/${encodePath(path)}?ref=${encodeURIComponent(ref)}`)).sha;
+    } catch (e) {
+      if ((e as { status?: number }).status === 404) return null;
+      throw e;
+    }
+  }
+
+  /** GitHub rejects a whole tree if it deletes a path that isn't there, e.g. one main removed since. */
+  private async dropMissingDeletes(entries: TreeEntry[], ref: string) {
+    const keep: TreeEntry[] = [];
+    for (const e of entries) if (e.sha !== null || (await this.blobSha(e.path, ref)) !== null) keep.push(e);
+    if (!keep.length) throw new StoreError("Nothing left to change: those files are already gone");
+    return keep;
   }
 
   async history(limit = 8): Promise<Commit[]> {
@@ -213,19 +230,13 @@ export class GitHubStore implements Store {
     const skipped = files.map((f) => f.filename).filter((p) => !isContentPath(p));
     const entries: TreeEntry[] = [];
     for (const f of files.filter((f) => isContentPath(f.filename))) {
-      let before: string | null = null;
-      try {
-        before = (await this.api<{ sha: string }>(`/contents/${encodePath(f.filename)}?ref=${parent}`)).sha;
-      } catch (e) {
-        if ((e as { status?: number }).status !== 404) throw e;
-      }
-      entries.push({ path: f.filename, mode: "100644", type: "blob", sha: before });
+      entries.push({ path: f.filename, mode: "100644", type: "blob", sha: await this.blobSha(f.filename, parent) });
     }
     if (!entries.length) throw new StoreError("That commit changed no content files");
     const live = await this.refSha(this.branch);
     if (!live) throw new StoreError(`Branch ${this.branch} not found`);
     const title = commit.commit.message.split("\n")[0];
-    const newSha = await this.commitTree(live, entries, `Revert content: ${title}\n\nRestores content changed in ${sha.slice(0, 7)}.`);
+    const newSha = await this.commitTree(live, await this.dropMissingDeletes(entries, live), `Revert content: ${title}\n\nRestores content changed in ${sha.slice(0, 7)}.`);
     await this.api(`/git/refs/heads/${this.branch}`, { method: "PATCH", body: JSON.stringify({ sha: newSha, force: false }) });
     return { sha: newSha, skipped };
   }

@@ -32,7 +32,7 @@ export type Finding = { level: "error" | "warn" | "ok"; text: string; href?: str
 
 const numbersNear = (text: string, word: RegExp) => {
   const out: number[] = [];
-  for (const m of text.matchAll(new RegExp(`${word.source}[^\\n]{0,80}`, "gi"))) {
+  for (const m of text.matchAll(new RegExp(`\\b(?:${word.source})[^\\n]{0,80}`, "gi"))) {
     for (const n of m[0].matchAll(/\d[\d,]*/g)) out.push(Number(n[0].replace(/,/g, "")));
   }
   return out;

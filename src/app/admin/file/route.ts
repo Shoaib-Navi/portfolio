@@ -23,7 +23,9 @@ export async function GET(request: Request) {
   return new Response(Buffer.from(bytes), {
     headers: {
       "Content-Type": TYPES[match[2]],
-      "Cache-Control": "private, no-store",
+      // Uploaded images get unique names, so a short private cache saves GitHub API calls.
+      // PDFs keep fixed names (/resume.pdf), so they are always fetched fresh.
+      "Cache-Control": match[2] === "pdf" ? "private, no-store" : "private, max-age=60",
       "X-Content-Type-Options": "nosniff",
       // An SVG opened directly renders as a document; give it nothing to run.
       "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src data:",

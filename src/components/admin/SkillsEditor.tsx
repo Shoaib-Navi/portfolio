@@ -151,7 +151,7 @@ function SkillPanel({
   const [name, setName] = useState(editing?.name ?? "");
   const [group, setGroup] = useState(target?.group ?? 0);
   const [choice, setChoice] = useState<LogoChoice>(editing ? { kind: "keep" } : { kind: "none" });
-  const [tab, setTab] = useState<"devicon" | "upload" | "none">(editing?.logo ? "devicon" : "devicon");
+  const [tab, setTab] = useState<"devicon" | "upload" | "none">("devicon");
   const [query, setQuery] = useState(editing?.name ?? "");
   const [hits, setHits] = useState<DeviconHit[]>([]);
   const [searching, startSearch] = useTransition();
