@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Finding } from "@/lib/admin/resume";
 import type { DeployState } from "@/lib/admin/store/types";
+import { timeAgo } from "@/lib/format";
 
 export function PageHead({
   crumb,
@@ -79,10 +80,5 @@ export function LoadError({ message }: { message: string }) {
   );
 }
 
-export const ago = (iso: string, now = Date.now()) => {
-  const s = Math.max(0, Math.round((now - new Date(iso).getTime()) / 1000));
-  if (s < 60) return "just now";
-  if (s < 3600) return `${Math.round(s / 60)} min ago`;
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
-  return `${Math.round(s / 86400)} d ago`;
-};
+export const ago = (iso: string, now = Date.now()) => timeAgo(iso, now);
+

@@ -1315,3 +1315,165 @@ html:has(.adm) #cursor {
     transition: none !important;
   }
 }
+
+/* --------------------------- Analytics --------------------------- */
+/* Single data series in the accent family, validated for contrast on the card surface
+   (light #b07d00 on #fff, dark #b8862a on #1b1d29). Text never uses it. */
+.adm {
+  --series: #b07d00;
+  --grid: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+:root[data-theme="dark"] .adm {
+  --series: #b8862a;
+}
+
+.adm .range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.adm .range a {
+  text-decoration: none;
+}
+
+.adm .chart {
+  position: relative;
+}
+
+.adm .chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.adm .chart__axis {
+  font-size: 11px;
+  fill: var(--ink-subtle);
+}
+
+.adm .chart__grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.adm .chart__base {
+  stroke: color-mix(in srgb, var(--ink) 35%, transparent);
+  stroke-width: 1;
+}
+
+.adm .chart__bar {
+  fill: var(--series);
+}
+
+.adm .chart__hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.adm .chart__hit:focus-visible {
+  outline: none;
+  fill: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.adm .chart__band--on {
+  fill: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.adm .chart__tip {
+  position: absolute;
+  z-index: 2;
+  min-width: 150px;
+  padding: 8px 10px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  pointer-events: none;
+  background: var(--surface);
+  border: var(--bw) solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
+.adm .chart__tip b {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.adm .chart__key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  background: var(--series);
+  border-radius: 2px;
+}
+
+.adm .toplist {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adm .toplist li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: baseline;
+  font-size: 0.875rem;
+}
+
+.adm .toplist__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adm .toplist__value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.adm .toplist__track {
+  grid-column: 1 / -1;
+  height: 6px;
+  overflow: hidden;
+  background: var(--logo-pad);
+  border-radius: 99px;
+}
+
+.adm .toplist__fill {
+  display: block;
+  height: 100%;
+  background: var(--series);
+  border-radius: 99px;
+}
+
+.adm .datatable {
+  width: 100%;
+  font-size: 0.8125rem;
+  border-collapse: collapse;
+}
+
+.adm .datatable th,
+.adm .datatable td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.adm .datatable td:not(:first-child),
+.adm .datatable th:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adm .table-scroll {
+  max-height: 320px;
+  overflow: auto;
+}

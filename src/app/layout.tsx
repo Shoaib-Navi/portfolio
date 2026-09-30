@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 import Cursor from "@/components/Cursor";
 import SiteFX from "@/components/SiteFX";
 import { profile } from "@/data/profile";
@@ -55,6 +56,7 @@ export default function RootLayout({
         {children}
         <Cursor />
         <SiteFX />
+        <AnalyticsTracker />
       </body>
     </html>
   );

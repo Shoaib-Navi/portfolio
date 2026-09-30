@@ -51,7 +51,13 @@ export default function AdminNav({
         { href: "/admin/media", label: "Media library" },
       ],
     },
-    { title: "Site", items: [{ href: "/admin/publish", label: "Publish", count: pending || undefined }] },
+    {
+      title: "Site",
+      items: [
+        { href: "/admin/analytics", label: "Analytics" },
+        { href: "/admin/publish", label: "Publish", count: pending || undefined },
+      ],
+    },
   ];
 
   const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));

@@ -13,3 +13,6 @@ refrence/
 
 # admin drafts in local dev (see src/lib/admin/store/local.ts)
 .admin-draft/
+
+# local analytics data (see src/lib/analytics/file.ts)
+.analytics/

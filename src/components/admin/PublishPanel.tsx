@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { deployStatusAction, discardAction, publishAction, rollbackAction } from "@/app/admin/actions";
 import type { DiffLine } from "@/lib/admin/diff";
+import { formatDateTime } from "@/lib/format";
 import type { Commit, DeployState, Pending } from "@/lib/admin/store/types";
 import { useToast } from "./Toasts";
 
@@ -160,7 +161,7 @@ export function PublishPanel({
                   <span className="row__main">
                     <b title={c.message}>{c.message}</b>
                     <span className="muted">
-                      <span className="code">{c.sha.slice(0, 7)}</span> · {new Date(c.date).toLocaleString()}
+                      <span className="code">{c.sha.slice(0, 7)}</span> · {formatDateTime(c.date)}
                     </span>
                   </span>
                   {mode === "github" ? (

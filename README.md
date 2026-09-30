@@ -62,6 +62,25 @@ session again. Passwords are scrypt-hashed; the session is an HMAC-signed, httpO
 cookie (8 hours); sign-in is throttled. The GitHub token stays on the server and can only write
 `content/` and the managed `public/` folders. `/admin` is `noindex` and disallowed in `robots.txt`.
 
+## Analytics (`/admin/analytics`)
+
+First-party and cookieless, so no consent banner is needed. Each page view and click
+(résumé download, outbound links such as GitHub or a live demo) is sent to `/api/t`, which
+drops bots, your own visits while signed in to the admin, and visitors with Do Not Track or
+Global Privacy Control on. Stored: counts per day (pages, sources, countries, devices), a
+visitor hash that rotates daily (for unique counts; never the IP or user agent), and the last
+100 hits for the activity feed.
+
+**Tracking links**: create one per application (`/?ref=acme-backend`). Visits through it,
+pages viewed and résumé downloads are credited to that link, so you can tell when that
+company opened your portfolio. Link names are stored in the analytics database, not in this
+(public) repository.
+
+**Set up on Vercel**: Storage → Create Database → *Upstash for Redis* (free plan), connect it
+to the project and redeploy. It adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Locally, data
+goes to `.analytics/` (gitignored); open the site in a private window to see your own test
+visits.
+
 `npm test` runs the unit tests (validators, upload checks, résumé checks, sessions, and the GitHub
 store against a fake API).
 

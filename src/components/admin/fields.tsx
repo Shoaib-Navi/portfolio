@@ -3,6 +3,7 @@
 import { useId, useRef, type ReactNode } from "react";
 import Rich from "@/components/Rich";
 import type { Issue } from "@/lib/content/schema";
+import { formatDateTime } from "@/lib/format";
 
 type Base = { label: string; error?: string; hint?: ReactNode; max?: number };
 
@@ -230,7 +231,7 @@ export function SaveBar({
 export function RestoreBanner({ at, onRestore, onDrop }: { at: string; onRestore: () => void; onDrop: () => void }) {
   return (
     <div className="banner banner--info" role="status">
-      <span>You have unsaved edits from {new Date(at).toLocaleString()}. Restore them?</span>
+      <span>You have unsaved edits from {formatDateTime(at)}. Restore them?</span>
       <span className="adm-actions">
         <button type="button" className="btn btn--sm" onClick={onDrop}>
           Discard

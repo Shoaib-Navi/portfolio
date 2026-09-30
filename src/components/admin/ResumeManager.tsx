@@ -5,6 +5,7 @@ import { useRef, useState, useTransition } from "react";
 import { deleteResumeVersion, setLiveResume, uploadResume } from "@/app/admin/actions";
 import { adminSrc } from "@/lib/admin/paths";
 import type { Resumes } from "@/lib/content/schema";
+import { formatDate } from "@/lib/format";
 import { kb } from "./image";
 import { useToast } from "./Toasts";
 
@@ -80,7 +81,7 @@ export function ResumeManager({ resumes }: { resumes: Resumes }) {
                 <span className="row__main">
                   <b title={v.label}>{v.label}</b>
                   <span className="muted">
-                    {new Date(v.uploadedAt).toLocaleDateString()} · {v.checks.pages} page{v.checks.pages === 1 ? "" : "s"} · {kb(v.checks.bytes)}
+                    {formatDate(v.uploadedAt)} · {v.checks.pages} page{v.checks.pages === 1 ? "" : "s"} · {kb(v.checks.bytes)}
                   </span>
                 </span>
                 <span className="row__end">
