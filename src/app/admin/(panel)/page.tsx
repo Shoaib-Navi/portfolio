@@ -71,7 +71,9 @@ export default async function Overview() {
                     <span className="thumb" />
                   )}
                   <span className="row__main">
-                    <Link href={`/admin/projects/${p.slug}`}>{p.name}</Link>
+                    <Link href={`/admin/projects/${p.slug}`} title={p.name}>
+                      {p.name}
+                    </Link>
                     <span className="muted">{p.tagline}</span>
                   </span>
                   {!p.verified ? <span className="pill pill--warn">Unverified</span> : null}
@@ -116,7 +118,7 @@ export default async function Overview() {
                 {history.map((c) => (
                   <li key={c.sha} className="row">
                     <span className="row__main">
-                      <b>{c.message}</b>
+                      <b title={c.message}>{c.message}</b>
                       <span className="muted">
                         <span className="code">{c.sha.slice(0, 7)}</span> · {ago(c.date)}
                       </span>

@@ -18,6 +18,9 @@
   min-height: 100dvh;
   font-size: 0.9375rem;
   line-height: 1.5;
+  /* "anywhere" (unlike "break-word") also lowers min-content width, so a long URL or path
+     can't force a grid column or flex row wider than the screen. */
+  overflow-wrap: anywhere;
   color: var(--ink);
   background: var(--canvas-base);
 }
@@ -225,8 +228,14 @@ html:has(.adm) #cursor {
   margin-bottom: 24px;
 }
 
+.adm-top > div:first-child {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
 .adm-top h1 {
   font-size: clamp(1.5rem, 3vw, 2rem);
+  overflow-wrap: anywhere;
 }
 
 .adm-top p {
@@ -400,6 +409,11 @@ html:has(.adm) #cursor {
   margin-bottom: 14px;
 }
 
+.adm .card__head > :first-child {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
 .adm .card__head h2 {
   font-size: 1.0625rem;
 }
@@ -413,6 +427,10 @@ html:has(.adm) #cursor {
 .adm .grid {
   display: grid;
   gap: 18px;
+}
+
+.adm .grid > * {
+  min-width: 0;
 }
 
 .adm .grid--2 {
@@ -490,10 +508,16 @@ html:has(.adm) #cursor {
   list-style: none;
 }
 
+.adm .rows > li {
+  min-width: 0;
+  container-type: inline-size;
+}
+
 .adm .row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
   min-width: 0;
   padding: 10px 0;
   border-bottom: 1.5px dashed var(--line);
@@ -504,7 +528,7 @@ html:has(.adm) #cursor {
 }
 
 .adm .row__main {
-  flex: 1;
+  flex: 1 1 10rem;
   min-width: 0;
 }
 
@@ -523,6 +547,16 @@ html:has(.adm) #cursor {
 
 .adm .row__main a:hover {
   text-decoration: underline;
+}
+
+/* Trailing pills and buttons of a row wrap as one group, aligned right. */
+.adm .row__end {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .adm .muted {
@@ -651,6 +685,10 @@ html:has(.adm) #cursor {
   margin-bottom: 14px;
 }
 
+.adm .field > * {
+  min-width: 0;
+}
+
 .adm .field > label,
 .adm .field__label {
   font-size: 0.6875rem;
@@ -736,12 +774,72 @@ html:has(.adm) #cursor {
   border-radius: 10px;
 }
 
+.adm .subrow > .order {
+  grid-area: ctrl;
+}
+
+.adm .subrow > :nth-child(2) {
+  grid-area: body;
+  min-width: 0;
+}
+
+.adm .subrow > :last-child {
+  grid-area: del;
+}
+
+.adm .subrow {
+  grid-template-areas: "ctrl body del";
+}
+
+@container (max-width: 520px) {
+  .adm .subrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "ctrl del"
+      "body body";
+    padding: 10px;
+  }
+
+  .adm .row .thumb {
+    width: 56px;
+    height: 36px;
+  }
+}
+
+@container (max-width: 400px) {
+  .adm .row .thumb {
+    display: none;
+  }
+}
+
+/* Native drag and drop doesn't work with touch; the arrow buttons do. */
+@media (pointer: coarse) {
+  .adm .handle {
+    display: none;
+  }
+}
+
 .adm .subrow .field {
   margin-bottom: 8px;
 }
 
 .adm .subrow .field:last-child {
   margin-bottom: 0;
+}
+
+.adm .fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  column-gap: 16px;
+}
+
+.adm .fields--sm {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  column-gap: 10px;
+}
+
+.adm .fields > * {
+  min-width: 0;
 }
 
 .adm .toolbar {
@@ -774,7 +872,9 @@ html:has(.adm) #cursor {
 .adm .chip {
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
   gap: 8px;
+  overflow-wrap: anywhere;
   padding: 4px 10px 4px 4px;
   font-size: 0.875rem;
   background: var(--surface);
@@ -1111,7 +1211,7 @@ html:has(.adm) #cursor {
 
 .adm-savebar {
   position: sticky;
-  bottom: 16px;
+  bottom: max(12px, env(safe-area-inset-bottom));
   z-index: 20;
   display: flex;
   flex-wrap: wrap;
@@ -1124,6 +1224,22 @@ html:has(.adm) #cursor {
   border: var(--bw) solid var(--border);
   border-radius: 12px;
   box-shadow: var(--shadow);
+}
+
+@media (max-width: 560px) {
+  .adm-savebar {
+    padding: 8px 10px;
+  }
+
+  .adm-savebar .adm-actions {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+  }
+
+  .adm-savebar .btn {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
 
 .adm-savebar--inline {
@@ -1144,6 +1260,7 @@ html:has(.adm) #cursor {
 }
 
 .adm .code {
+  overflow-wrap: anywhere;
   padding: 1px 5px;
   font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
   font-size: 0.85em;

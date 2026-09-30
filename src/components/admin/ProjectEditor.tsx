@@ -123,7 +123,7 @@ export function ProjectEditor({
         <div className="grid grid--main">
           <div className="stack">
             <section className="card">
-              <div className="grid grid--2" style={{ gap: "0 18px" }}>
+              <div className="fields">
                 <TextField
                   label="Name"
                   value={p.name}
@@ -143,7 +143,7 @@ export function ProjectEditor({
               </div>
               <TextField label="Tagline" value={p.tagline} onChange={(tagline) => set({ tagline })} error={err("tagline")} max={100} />
               <RichField label="Lede" value={p.lede} onChange={(lede) => set({ lede })} error={err("lede")} max={400} rich={false} />
-              <div className="grid grid--2" style={{ gap: "0 18px" }}>
+              <div className="fields">
                 <TextField
                   label="Status"
                   value={p.status ?? ""}

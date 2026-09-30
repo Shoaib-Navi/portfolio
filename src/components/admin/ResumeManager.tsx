@@ -48,7 +48,7 @@ export function ResumeManager({ resumes }: { resumes: Resumes }) {
           <h2>Upload a new version</h2>
           <p>PDF, max 2 MB. Uploading doesn’t replace the live file; choose “Make live” afterwards.</p>
         </div>
-        <div className="grid grid--2" style={{ gap: "0 14px" }}>
+        <div className="fields">
           <div className="field">
             <label htmlFor="resume-label">Label</label>
             <input id="resume-label" className="input" value={label} maxLength={60} placeholder="Backend · no phone" onChange={(e) => setLabel(e.target.value)} />
@@ -75,18 +75,18 @@ export function ResumeManager({ resumes }: { resumes: Resumes }) {
           {resumes.versions.map((v) => {
             const live = v.id === resumes.live;
             return (
-              <li key={v.id} className="row" style={{ flexWrap: "wrap" }}>
+              <li key={v.id} className="row">
                 {live ? <span className="pill pill--ok">Live</span> : <span className="pill">Draft</span>}
                 <span className="row__main">
-                  <b>{v.label}</b>
+                  <b title={v.label}>{v.label}</b>
                   <span className="muted">
                     {new Date(v.uploadedAt).toLocaleDateString()} · {v.checks.pages} page{v.checks.pages === 1 ? "" : "s"} · {kb(v.checks.bytes)}
                   </span>
                 </span>
-                {v.checks.phone ? <span className="pill pill--bad">Phone number</span> : <span className="pill pill--ok">No phone</span>}
-                {!v.checks.textLayer ? <span className="pill pill--bad">No text layer</span> : null}
-                {v.checks.pages > 1 ? <span className="pill pill--warn">{v.checks.pages} pages</span> : null}
-                <span className="adm-actions">
+                <span className="row__end">
+                  {v.checks.phone ? <span className="pill pill--bad">Phone number</span> : <span className="pill pill--ok">No phone</span>}
+                  {!v.checks.textLayer ? <span className="pill pill--bad">No text layer</span> : null}
+                  {v.checks.pages > 1 ? <span className="pill pill--warn">{v.checks.pages} pages</span> : null}
                   <a className="btn btn--sm" href={adminSrc(v.file)} target="_blank" rel="noopener">
                     Open
                   </a>

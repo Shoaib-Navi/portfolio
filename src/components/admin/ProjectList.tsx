@@ -31,14 +31,18 @@ export function ProjectList({ initial }: { initial: Project[] }) {
                 </span>
                 {p.shots[0] ? <img className="thumb" src={adminSrc(p.shots[0])} alt="" /> : <span className="thumb" />}
                 <span className="row__main">
-                  <Link href={`/admin/projects/${p.slug}`}>{p.name}</Link>
+                  <Link href={`/admin/projects/${p.slug}`} title={p.name}>
+                    {p.name}
+                  </Link>
                   <span className="muted">{p.tagline}</span>
                 </span>
-                {!p.verified ? <span className="pill pill--warn">Unverified</span> : null}
-                {p.status ? <span className="pill pill--info">{p.status.split("·")[0].trim()}</span> : null}
-                <Link href={`/admin/projects/${p.slug}`} className="btn btn--sm">
-                  Edit
-                </Link>
+                <span className="row__end">
+                  {!p.verified ? <span className="pill pill--warn">Unverified</span> : null}
+                  {p.status ? <span className="pill pill--info">{p.status.split("·")[0].trim()}</span> : null}
+                  <Link href={`/admin/projects/${p.slug}`} className="btn btn--sm">
+                    Edit
+                  </Link>
+                </span>
               </div>
             );
           }}

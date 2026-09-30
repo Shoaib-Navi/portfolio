@@ -40,11 +40,11 @@ export function SkillsEditor({ initial }: { initial: SkillGroup[] }) {
             render={(g, gi, controls) => (
               <section className="card" style={{ marginBottom: 14 }}>
                 <div className="card__head" style={{ alignItems: "flex-start" }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     {controls}
                     <input
                       className="input"
-                      style={{ fontWeight: 700, maxWidth: 280 }}
+                      style={{ fontWeight: 700, flex: "1 1 8rem", minWidth: 0, maxWidth: 320 }}
                       aria-label="Group name"
                       value={g.label}
                       aria-invalid={f.issueAt(`[${gi}].label`) ? true : undefined}

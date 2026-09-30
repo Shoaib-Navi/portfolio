@@ -23,7 +23,7 @@ export function ProfileEditor({ initial }: { initial: Profile }) {
         <div className="card__head">
           <h2>Identity</h2>
         </div>
-        <div className="grid grid--2" style={{ gap: "0 18px" }}>
+        <div className="fields">
           <TextField label="Name" value={p.name} onChange={(name) => set({ name })} error={f.issueAt("name")} max={80} />
           <TextField
             label="Initials"
@@ -111,7 +111,7 @@ export function ProfileEditor({ initial }: { initial: Profile }) {
           addLabel="+ Add link"
           max={8}
           render={(link, update, i) => (
-            <div className="grid grid--2" style={{ gap: "0 12px" }}>
+            <div className="fields">
               <TextField label="Label" value={link.label} onChange={(label) => update({ ...link, label })} error={f.issueAt(`links[${i}].label`)} />
               <TextField label="URL" value={link.href} onChange={(href) => update({ ...link, href })} error={f.issueAt(`links[${i}].href`)} mono />
             </div>
@@ -144,7 +144,7 @@ export function StatsEditor({ initial }: { initial: Stat[] }) {
         render={(s, update, i) => (
           <>
             <TextField label="Label" value={s.label} onChange={(label) => update({ ...s, label })} error={f.issueAt(`[${i}].label`)} />
-            <div className="grid grid--3" style={{ gap: "0 10px", gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+            <div className="fields fields--sm">
               <TextField label="Shown as" value={s.value} onChange={(value) => update({ ...s, value })} error={f.issueAt(`[${i}].value`)} placeholder="1,709" />
               <NumberField label="Count to" value={s.count} onChange={(count) => update({ ...s, count })} error={f.issueAt(`[${i}].count`)} />
               <NumberField label="Decimals" value={s.dec} onChange={(dec) => update({ ...s, dec })} error={f.issueAt(`[${i}].dec`)} />

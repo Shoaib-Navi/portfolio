@@ -38,7 +38,7 @@ export function ExperienceEditor({ initial, tools }: { initial: Job[]; tools: To
           const err = (k: string) => f.issueAt(`[${i}].${k}`);
           return (
             <div>
-              <div className="grid grid--2" style={{ gap: "0 14px" }}>
+              <div className="fields">
                 <TextField
                   label="Company"
                   value={job.company}
