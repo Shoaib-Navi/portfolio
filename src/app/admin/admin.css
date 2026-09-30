@@ -680,6 +680,9 @@ html:has(.adm) #cursor {
 /* ---------------------------- Forms ---------------------------- */
 .adm .field {
   display: grid;
+  /* Fields in a row are stretched to the tallest one; keep the label and input packed at
+     the top so inputs line up whether or not a field has a hint line underneath. */
+  align-content: start;
   gap: 5px;
   min-width: 0;
   margin-bottom: 14px;
