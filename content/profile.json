@@ -1,0 +1,43 @@
+{
+  "name": "Mohd Shoaib",
+  "initials": "MS",
+  "role": "Software Engineer",
+  "photo": {
+    "src": "/pfp/shoaib.webp",
+    "width": 720,
+    "height": 960
+  },
+  "location": "Ghaziabad, India",
+  "email": "mohdshoaib97569@gmail.com",
+  "resume": "/resume.pdf",
+  "headline": {
+    "lead": "Software Engineer —",
+    "emphasis": "Backend (Python, FastAPI, Node.js, PostgreSQL)",
+    "tail": "with testing and reliability at the centre."
+  },
+  "about": {
+    "lede": "Final-year B.Tech Information Technology student at ABES Engineering College (AKTU), Ghaziabad.",
+    "notes": [
+      "Currently building CarePulse, a multi-tenant hospital management system, as a team of two.",
+      "Previously an LLM Post-Training Intern at Ethara AI (Apr 2026 – May 2026).",
+      "Relevant coursework: Data Structures & Algorithms, Object-Oriented Programming, DBMS, Operating Systems."
+    ]
+  },
+  "links": [
+    {
+      "label": "GitHub",
+      "href": "https://github.com/Shoaib-Navi",
+      "icon": "↗"
+    },
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/in/shoaib-navi/",
+      "icon": "↗"
+    },
+    {
+      "label": "LeetCode",
+      "href": "https://leetcode.com/u/shoaib_navi/",
+      "icon": "↗"
+    }
+  ]
+}
