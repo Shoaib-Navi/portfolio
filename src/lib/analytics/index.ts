@@ -29,6 +29,9 @@ class OffAnalytics implements AnalyticsStore {
   async hasLink() {
     return false;
   }
+  async getLink() {
+    return null;
+  }
   async saveLink(): Promise<void> {
     throw new Error("Analytics storage is not configured");
   }

@@ -16,11 +16,13 @@ import {
 // the Redis store, so the admin page can be tried without an account.
 
 type Day = { pv: Counts; uv: string[]; src: Counts; geo: Counts; dev: Counts; ev: Counts; out: Counts };
-type Data = { days: Record<string, Day>; links: Record<string, TrackingLink>; stats: Record<string, LinkStats>; recent: RecentHit[] };
+type StoredStats = Omit<LinkStats, "uniques"> & { openers: string[] };
+type Data = { days: Record<string, Day>; links: Record<string, TrackingLink>; stats: Record<string, StoredStats>; recent: RecentHit[] };
 
 const FILE = path.join(process.cwd(), ".analytics", "data.json");
 const inc = (c: Counts, k: string) => (c[k] = (c[k] ?? 0) + 1);
 const blankDay = (): Day => ({ pv: {}, uv: [], src: {}, geo: {}, dev: {}, ev: {}, out: {} });
+const blankStats = (): StoredStats => ({ opens: 0, pages: 0, downloads: 0, sources: {}, openers: [] });
 
 let queue: Promise<unknown> = Promise.resolve();
 
@@ -48,6 +50,7 @@ export class FileAnalytics implements AnalyticsStore {
   readonly mode = "file" as const;
 
   async record(hit: Hit) {
+    const resumeOpen = hit.kind === "open" && hit.target === "/resume.pdf";
     await update((data) => {
       const day = (data.days[hit.day] ??= blankDay());
       if (hit.kind === "pageview") {
@@ -56,16 +59,20 @@ export class FileAnalytics implements AnalyticsStore {
         inc(day.src, hit.source ?? "Direct");
         inc(day.geo, hit.country);
         inc(day.dev, hit.device);
-      } else if (hit.kind === "download") inc(day.ev, "download");
-      else if (hit.target) inc(day.out, hit.target);
+      } else if (hit.kind === "download" || resumeOpen) inc(day.ev, "download");
+      else if (hit.kind === "outbound" && hit.target) inc(day.out, hit.target);
 
       if (hit.ref) {
-        const st = (data.stats[hit.ref] ??= { opens: 0, pages: 0, downloads: 0 });
-        if (hit.kind === "download") st.downloads++;
-        if (hit.kind === "pageview") {
-          if (hit.landing) st.opens++;
-          st.pages++;
+        const st = (data.stats[hit.ref] ??= blankStats());
+        st.sources ??= {};
+        st.openers ??= [];
+        if (hit.kind === "open" || (hit.kind === "pageview" && hit.landing)) {
+          st.opens++;
+          if (!st.openers.includes(hit.visitor)) st.openers.push(hit.visitor);
+          inc(st.sources, hit.source ?? "Direct");
         }
+        if (hit.kind === "pageview") st.pages++;
+        if (hit.kind === "download" || resumeOpen) st.downloads++;
         st.first ??= hit.at;
         st.last = hit.at;
       }
@@ -104,12 +111,19 @@ export class FileAnalytics implements AnalyticsStore {
   async links() {
     const data = await load();
     return Object.values(data.links)
-      .map((l) => ({ ...l, ...(data.stats[l.code] ?? { opens: 0, pages: 0, downloads: 0 }) }))
+      .map((l) => {
+        const { openers = [], sources = {}, ...st } = data.stats[l.code] ?? blankStats();
+        return { ...l, ...st, sources, uniques: openers.length };
+      })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
   async hasLink(code: string) {
     return code in (await load()).links;
+  }
+
+  async getLink(code: string) {
+    return (await load()).links[code] ?? null;
   }
 
   async saveLink(link: TrackingLink) {

@@ -17,6 +17,7 @@ import {
 //   a:dev:<day>  hash  device -> pageviews      a:ev:<day>  hash "download" -> count
 //   a:out:<day>  hash  host -> clicks           a:recent    list of the last hits (JSON)
 //   a:links      hash  code -> link JSON        a:link:<code> hash of that link's stats
+//   a:luv:<code> HyperLogLog of a link's openers a:lsrc:<code> hash source -> opens
 
 type Cmd = (string | number)[];
 
@@ -28,6 +29,8 @@ const toCounts = (flat: unknown): Counts => {
   if (Array.isArray(flat)) for (let i = 0; i + 1 < flat.length; i += 2) out[String(flat[i])] = Number(flat[i + 1]) || 0;
   return out;
 };
+
+const isResumeOpen = (hit: Hit) => hit.kind === "open" && hit.target === "/resume.pdf";
 
 const add = (into: Counts, from: Counts) => {
   for (const [k, v] of Object.entries(from)) into[k] = (into[k] ?? 0) + v;
@@ -67,20 +70,25 @@ export class RedisAnalytics implements AnalyticsStore {
       cmds.push(["HINCRBY", `a:src:${d}`, hit.source ?? "Direct", 1]);
       cmds.push(["HINCRBY", `a:geo:${d}`, hit.country, 1], ["HINCRBY", `a:dev:${d}`, hit.device, 1]);
       ["pv", "uv", "src", "geo", "dev"].forEach((k) => touch(`a:${k}:${d}`));
-    } else if (hit.kind === "download") {
+    } else if (hit.kind === "download" || isResumeOpen(hit)) {
+      // A tracking link pointed at the résumé is a download the browser never reports.
       cmds.push(["HINCRBY", `a:ev:${d}`, "download", 1]);
       touch(`a:ev:${d}`);
-    } else if (hit.target) {
+    } else if (hit.kind === "outbound" && hit.target) {
       cmds.push(["HINCRBY", `a:out:${d}`, hit.target, 1]);
       touch(`a:out:${d}`);
     }
 
     if (hit.ref) {
       const key = `a:link:${hit.ref}`;
-      const field = hit.kind === "download" ? "downloads" : hit.kind === "pageview" ? (hit.landing ? "opens" : "pages") : null;
-      if (field) cmds.push(["HINCRBY", key, field, 1]);
-      // A landing also counts as a page viewed.
-      if (hit.landing) cmds.push(["HINCRBY", key, "pages", 1]);
+      // An open is either /go/<code> (server) or a landing on /?ref=<code> (legacy, client).
+      const opened = hit.kind === "open" || (hit.kind === "pageview" && hit.landing);
+      if (opened) {
+        cmds.push(["HINCRBY", key, "opens", 1], ["PFADD", `a:luv:${hit.ref}`, hit.visitor]);
+        cmds.push(["HINCRBY", `a:lsrc:${hit.ref}`, hit.source ?? "Direct", 1]);
+      }
+      if (hit.kind === "pageview") cmds.push(["HINCRBY", key, "pages", 1]);
+      if (hit.kind === "download" || isResumeOpen(hit)) cmds.push(["HINCRBY", key, "downloads", 1]);
       cmds.push(["HSETNX", key, "first", hit.at], ["HSET", key, "last", hit.at]);
     }
 
@@ -148,16 +156,24 @@ export class RedisAnalytics implements AnalyticsStore {
         /* skip a corrupt entry */
       }
     }
-    const stats = await this.pipeline(links.map((l) => ["HGETALL", `a:link:${l.code}`]));
+    const stats = await this.pipeline(
+      links.flatMap((l): Cmd[] => [
+        ["HGETALL", `a:link:${l.code}`],
+        ["PFCOUNT", `a:luv:${l.code}`],
+        ["HGETALL", `a:lsrc:${l.code}`],
+      ]),
+    );
     return links
       .map((l, i) => {
-        const raw = stats[i];
+        const [raw, uniques, sources] = stats.slice(i * 3, i * 3 + 3);
         const map: Record<string, string> = {};
         if (Array.isArray(raw)) for (let j = 0; j + 1 < raw.length; j += 2) map[String(raw[j])] = String(raw[j + 1]);
         const st: LinkStats = {
           opens: Number(map.opens) || 0,
+          uniques: Number(uniques) || 0,
           pages: Number(map.pages) || 0,
           downloads: Number(map.downloads) || 0,
+          sources: toCounts(sources),
           first: map.first,
           last: map.last,
         };
@@ -171,6 +187,16 @@ export class RedisAnalytics implements AnalyticsStore {
     return Number(n) === 1;
   }
 
+  async getLink(code: string) {
+    const [raw] = await this.pipeline([["HGET", "a:links", code]]);
+    if (typeof raw !== "string") return null;
+    try {
+      return JSON.parse(raw) as TrackingLink;
+    } catch {
+      return null;
+    }
+  }
+
   async saveLink(link: TrackingLink) {
     await this.pipeline([["HSET", "a:links", link.code, JSON.stringify(link)]]);
   }
@@ -179,6 +205,8 @@ export class RedisAnalytics implements AnalyticsStore {
     await this.pipeline([
       ["HDEL", "a:links", code],
       ["DEL", `a:link:${code}`],
+      ["DEL", `a:luv:${code}`],
+      ["DEL", `a:lsrc:${code}`],
     ]);
   }
 }

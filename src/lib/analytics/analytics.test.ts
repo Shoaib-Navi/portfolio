@@ -77,6 +77,8 @@ function fakeUpstash() {
         m.set(a[0], String(v));
         return v;
       }
+      case "HGET":
+        return hashes.get(key)?.get(a[0]) ?? null;
       case "HSET":
         h(key).set(a[0], a[1]);
         return 1;
@@ -170,30 +172,56 @@ describe("RedisAnalytics", () => {
     expect(JSON.stringify(recent)).not.toContain("v1");
   });
 
-  it("credits a tracking link: one open per landing, pages and downloads after it", async () => {
+  it("credits a tracking link: opens, unique openers, sources, pages and downloads", async () => {
     const store = new RedisAnalytics("https://redis.example", "tok");
-    await store.saveLink({ code: "acme", label: "Acme · Backend", createdAt: "2026-10-01T09:00:00.000Z" });
+    await store.saveLink({ code: "acme", label: "Acme · Backend", createdAt: "2026-10-01T09:00:00.000Z", target: "/work/carepulse" });
     expect(await store.hasLink("acme")).toBe(true);
     expect(await store.hasLink("other")).toBe(false);
+    expect(await store.getLink("acme")).toMatchObject({ target: "/work/carepulse" });
+    expect(await store.getLink("other")).toBeNull();
 
-    await store.record(hit({ ref: "acme", landing: true, at: "2026-10-01T10:00:00.000Z" }));
-    await store.record(hit({ ref: "acme", path: "/work", at: "2026-10-01T10:01:00.000Z" }));
-    await store.record(hit({ ref: "acme", kind: "download", at: "2026-10-01T10:02:00.000Z" }));
+    // Opened twice through /go by one person (from LinkedIn), once by another (no referrer).
+    await store.record(hit({ kind: "open", ref: "acme", target: "/work/carepulse", path: "/work/carepulse", source: "LinkedIn", visitor: "v1", at: "2026-10-01T10:00:00.000Z" }));
+    await store.record(hit({ kind: "open", ref: "acme", target: "/work/carepulse", path: "/work/carepulse", source: "LinkedIn", visitor: "v1", at: "2026-10-01T10:05:00.000Z" }));
+    await store.record(hit({ kind: "open", ref: "acme", target: "/work/carepulse", path: "/work/carepulse", source: "Direct", visitor: "v2", at: "2026-10-01T11:00:00.000Z" }));
+    // The pages they then viewed, and a résumé download.
+    await store.record(hit({ ref: "acme", path: "/work/carepulse", at: "2026-10-01T11:00:01.000Z" }));
+    await store.record(hit({ ref: "acme", path: "/work", at: "2026-10-01T11:01:00.000Z" }));
+    await store.record(hit({ ref: "acme", kind: "download", at: "2026-10-01T11:02:00.000Z" }));
 
     const [link] = await store.links();
     expect(link).toMatchObject({
       code: "acme",
-      label: "Acme · Backend",
-      opens: 1,
+      opens: 3,
+      uniques: 2,
       pages: 2,
       downloads: 1,
+      sources: { LinkedIn: 2, Direct: 1 },
       first: "2026-10-01T10:00:00.000Z",
-      last: "2026-10-01T10:02:00.000Z",
+      last: "2026-10-01T11:02:00.000Z",
     });
+    // An open is not an outbound click, and not a page view by itself.
+    const s = await store.summary(["2026-10-01"]);
+    expect(s.outbound).toEqual({});
+    expect(s.pageviews).toBe(2);
 
     await store.deleteLink("acme");
     expect(await store.links()).toEqual([]);
     expect(fake.hashes.has("a:link:acme")).toBe(false);
+    expect(fake.hashes.has("a:lsrc:acme")).toBe(false);
+  });
+
+  it("counts an open of a résumé link as a download, and a legacy ?ref landing as an open", async () => {
+    const store = new RedisAnalytics("https://redis.example", "tok");
+    await store.saveLink({ code: "cv", label: "CV link", createdAt: "2026-10-01T09:00:00.000Z", target: "/resume.pdf" });
+    await store.saveLink({ code: "old", label: "Old link", createdAt: "2026-10-01T09:00:00.000Z" });
+    await store.record(hit({ kind: "open", ref: "cv", target: "/resume.pdf", path: "/resume.pdf", source: "Email" }));
+    await store.record(hit({ ref: "old", landing: true, source: "Direct" }));
+
+    const links = Object.fromEntries((await store.links()).map((l) => [l.code, l]));
+    expect(links.cv).toMatchObject({ opens: 1, uniques: 1, downloads: 1, pages: 0, sources: { Email: 1 } });
+    expect(links.old).toMatchObject({ opens: 1, uniques: 1, pages: 1, downloads: 0 });
+    expect((await store.summary(["2026-10-01"])).downloads).toBe(1);
   });
 
   it("surfaces storage errors", async () => {

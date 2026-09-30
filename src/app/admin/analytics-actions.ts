@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin, Unauthorized } from "@/lib/admin/auth";
 import { getAnalytics, type TrackingLink } from "@/lib/analytics";
+import { isLinkTarget } from "@/lib/analytics/request";
 import type { Result } from "./actions";
 
 const slug = (s: string) =>
@@ -26,11 +27,15 @@ async function guarded<T>(fn: () => Promise<T>): Promise<Result<T>> {
   }
 }
 
-/** A link like /?ref=acme-backend to put in one application; visits through it are credited to it. */
-export async function createTrackingLink(label: string, code?: string): Promise<Result<TrackingLink>> {
+/**
+ * A link like /go/acme-backend to put in one application. It redirects to `target` (a page
+ * or the résumé PDF), and visits through it are credited to it.
+ */
+export async function createTrackingLink(label: string, target = "/", code?: string): Promise<Result<TrackingLink>> {
   return guarded(async () => {
     const clean = label.trim().slice(0, 60);
     if (!clean) throw new Error("Give the link a name, e.g. the company and role");
+    if (!isLinkTarget(target)) throw new Error("Choose where the link should go");
     const store = getAnalytics();
     let base = slug(code?.trim() || clean);
     if (!base) throw new Error("The code needs letters or numbers");
@@ -38,7 +43,7 @@ export async function createTrackingLink(label: string, code?: string): Promise<
     let candidate = base;
     for (let n = 2; await store.hasLink(candidate); n++) candidate = `${base.slice(0, 36)}-${n}`;
     base = candidate;
-    const link: TrackingLink = { code: base, label: clean, createdAt: new Date().toISOString() };
+    const link: TrackingLink = { code: base, label: clean, createdAt: new Date().toISOString(), target };
     await store.saveLink(link);
     return link;
   });

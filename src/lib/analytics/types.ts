@@ -3,7 +3,8 @@
 // unique counts, and the last 100 hits for the activity feed. No IP address, no cookie,
 // no user agent string is kept.
 
-export type HitKind = "pageview" | "download" | "outbound";
+/** "open" is a tracking link followed through /go/<code>, recorded by the server. */
+export type HitKind = "pageview" | "download" | "outbound" | "open";
 
 export type Hit = {
   kind: HitKind;
@@ -22,7 +23,7 @@ export type Hit = {
   ref?: string;
   /** True on the first pageview of a visit that arrived through ?ref= */
   landing?: boolean;
-  /** Outbound clicks: destination host */
+  /** Outbound clicks: destination (host + path, or "email"). Opens: where the link points. */
   target?: string;
 };
 
@@ -42,9 +43,25 @@ export type Summary = {
   outbound: Counts;
 };
 
-export type TrackingLink = { code: string; label: string; createdAt: string };
+export type TrackingLink = {
+  code: string;
+  label: string;
+  createdAt: string;
+  /** Where /go/<code> sends people: a site path or "/resume.pdf". Older links have none (home). */
+  target?: string;
+};
 
-export type LinkStats = { opens: number; pages: number; downloads: number; first?: string; last?: string };
+export type LinkStats = {
+  opens: number;
+  /** Distinct visitors (per day, like the site totals) who opened the link */
+  uniques: number;
+  pages: number;
+  downloads: number;
+  /** Where the opens came from, e.g. { LinkedIn: 2, Email: 1 } */
+  sources: Counts;
+  first?: string;
+  last?: string;
+};
 
 export type RecentHit = Pick<Hit, "kind" | "at" | "path" | "source" | "country" | "device" | "ref" | "target">;
 
@@ -55,6 +72,7 @@ export interface AnalyticsStore {
   recent(limit: number): Promise<RecentHit[]>;
   links(): Promise<(TrackingLink & LinkStats)[]>;
   hasLink(code: string): Promise<boolean>;
+  getLink(code: string): Promise<TrackingLink | null>;
   saveLink(link: TrackingLink): Promise<void>;
   deleteLink(code: string): Promise<void>;
 }

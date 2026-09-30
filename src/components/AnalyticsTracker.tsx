@@ -27,11 +27,18 @@ function currentRef(): { ref?: string; land: boolean } {
   let land = false;
   let ref: string | undefined;
   try {
-    const fromUrl = new URLSearchParams(location.search).get("ref");
+    const params = new URLSearchParams(location.search);
+    const fromUrl = params.get("ref");
     if (fromUrl) {
       ref = fromUrl.toLowerCase().slice(0, 40);
-      land = sessionStorage.getItem(REF_KEY) !== ref;
+      // Links through /go/<code> were already counted as an open by the server.
+      land = params.get("via") !== "go" && sessionStorage.getItem(REF_KEY) !== ref;
       sessionStorage.setItem(REF_KEY, ref);
+      if (params.has("via")) {
+        params.delete("via");
+        const query = params.toString();
+        history.replaceState(history.state, "", `${location.pathname}${query ? `?${query}` : ""}${location.hash}`);
+      }
     } else ref = sessionStorage.getItem(REF_KEY) ?? undefined;
   } catch {
     /* storage blocked: attribution only for the landing page */
@@ -68,7 +75,8 @@ export default function AnalyticsTracker() {
         return;
       }
       const { ref } = currentRef();
-      if (url.host === location.host && url.pathname === "/resume.pdf") send({ k: "dl", p: location.pathname, ref });
+      if (url.protocol === "mailto:") send({ k: "out", p: location.pathname, to: "mailto:", ref });
+      else if (url.host === location.host && url.pathname === "/resume.pdf") send({ k: "dl", p: location.pathname, ref });
       else if (url.host !== location.host && /^https?:$/.test(url.protocol)) send({ k: "out", p: location.pathname, to: url.href, ref });
     };
     document.addEventListener("click", onClick, { capture: true });

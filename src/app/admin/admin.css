@@ -540,6 +540,10 @@ html:has(.adm) #cursor {
   white-space: nowrap;
 }
 
+.adm .row__main > .muted {
+  display: block;
+}
+
 .adm .row__main a {
   font-weight: 700;
   text-decoration: none;
@@ -1326,6 +1330,27 @@ html:has(.adm) #cursor {
 
 :root[data-theme="dark"] .adm {
   --series: #b8862a;
+}
+
+.adm .delta {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-subtle);
+}
+
+.adm .delta span {
+  font-weight: 400;
+}
+
+/* Up is good for every figure shown here (visitors, views, downloads). */
+.adm .delta--up {
+  color: var(--ok);
+}
+
+.adm .delta--down {
+  color: var(--bad);
 }
 
 .adm .range {
