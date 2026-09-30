@@ -1773,6 +1773,71 @@ body {
   border-left: 4px solid var(--accent);
 }
 
+/* ============================ Project status ============================ */
+.site .health {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+
+.site .health h2 {
+  margin-bottom: 0.25rem;
+}
+
+.site .health__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9375rem;
+}
+
+.site .health__row > span:last-child {
+  display: grid;
+}
+
+.site .health__row b {
+  font-weight: 600;
+}
+
+.site .health__row span span {
+  font-size: 0.8125rem;
+  color: var(--ink-subtle);
+}
+
+.site .health__row--muted {
+  color: var(--ink-subtle);
+}
+
+.site .health__dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 0.45em;
+  background: var(--ink-subtle);
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+}
+
+/* Status colours always come with words ("is up", "isn't responding"), never alone. */
+.site .health__row--ok .health__dot {
+  background: #22c55e;
+}
+
+.site .health__row--down .health__dot {
+  background: #ef4444;
+}
+
+.site .health__dot--plain {
+  background: var(--surface);
+}
+
+.site .health__when {
+  font-size: 0.75rem;
+  color: var(--ink-subtle);
+}
+
 /* ============================ Notes ============================ */
 .site .note__title {
   max-width: 22ch;

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import Bar from "@/components/Bar";
 import DocFoot from "@/components/DocFoot";
 import ProjectArticle from "@/components/ProjectArticle";
+import ProjectHealth from "@/components/ProjectHealth";
 import { profile, projects } from "@/data/profile";
+import { statusTargets } from "@/lib/status";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -51,7 +53,10 @@ export default async function ProjectPage({ params }: Params) {
 
       <div className="doc">
         <main>
-          <ProjectArticle project={project} />
+          <ProjectArticle
+            project={project}
+            side={statusTargets().some((t) => t.slug === project.slug) ? <ProjectHealth slug={project.slug} /> : undefined}
+          />
         </main>
         <DocFoot back={{ href: "/work", label: "Back to all work" }} />
       </div>
