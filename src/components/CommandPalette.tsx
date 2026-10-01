@@ -155,7 +155,7 @@ export default function CommandPalette({ items }: { items: PaletteItem[] }) {
           <input
             ref={input}
             className="palette__input"
-            placeholder="Jump to a project, note, section…"
+            placeholder="Jump to a project, section, link…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}

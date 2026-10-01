@@ -71,18 +71,39 @@ Global Privacy Control on. Stored: counts per day (pages, sources, countries, de
 visitor hash that rotates daily (for unique counts; never the IP or user agent), and the last
 100 hits for the activity feed.
 
-**Tracking links**: create one per application (`/?ref=acme-backend`). Visits through it,
-pages viewed and résumé downloads are credited to that link, so you can tell when that
-company opened your portfolio. Link names are stored in the analytics database, not in this
-(public) repository.
+**Tracking links**: create one per application (`/go/acme-backend`). The open is recorded on
+the server and the visitor is redirected to the page you chose, so the link also works inside
+the résumé PDF. Visits through it, pages viewed and résumé downloads are credited to that
+link, so you can tell when that company opened your portfolio. Unknown codes redirect to the
+home page. Link names are stored in the analytics database, not in this (public) repository.
+Older `/?ref=acme-backend` links still count.
 
 **Set up on Vercel**: Storage → Create Database → *Upstash for Redis* (free plan), connect it
 to the project and redeploy. It adds `KV_REST_API_URL` and `KV_REST_API_TOKEN`. Locally, data
 goes to `.analytics/` (gitignored); open the site in a private window to see your own test
 visits.
 
-`npm test` runs the unit tests (validators, upload checks, résumé checks, sessions, and the GitHub
-store against a fake API).
+## Case studies
+
+A project can carry a `caseStudy` in `content/projects.json`: headed sections written in a small
+Markdown subset, with an optional architecture diagram. It renders below the write-up on
+`/work/<slug>` and gets its own entry in the command palette. A case study has its own
+`verified` flag: while it is `false` the text shows in `npm run dev` and in the admin for
+review, and is left out of every production build.
+
+## Project status (`/api/status`)
+
+Each write-up page shows a small status panel, loaded after the page so the page itself stays
+static. It reports only what was actually checked: whether the live demo answered (HTTP status
+and response time) and when the public repository was last pushed. Projects without public
+links report nothing. The response is cached at the edge for ten minutes, so visitors never
+fan out into requests to the demo sites or GitHub. `GITHUB_TOKEN`, when set, is used for the
+repository lookup to avoid GitHub's anonymous rate limit.
+
+## Tests
+
+`npm test` runs the unit tests (validators, upload checks, résumé checks, sessions, the GitHub
+store against a fake API, analytics, status checks and the Markdown renderer).
 
 ## Layout (same structure as the reference site)
 
@@ -94,6 +115,7 @@ at that section — no `#` fragments. `/work` is the project index and `/work/<s
 ## Features
 
 - Fixed bar (monogram, section routes, light/dark toggle, résumé download) that grows a border once you scroll.
+- Command palette (Ctrl/Cmd + K, or the search button in the bar): jump to a project, case study or section, download the résumé, copy the email address, switch theme or open a profile link.
 - Theme choice saved in `localStorage` and applied before paint, so there is no flash.
 - Mobile menu drawer: burger button, backdrop, Escape to close, background scroll locked.
 - Hero entrance animation, drifting grid, pulsing glow and a light that follows the mouse.
@@ -134,14 +156,19 @@ src/
     opengraph-image.tsx   social preview image
     sitemap.ts / robots.ts
     icon.svg
-  components/             HomeView, Bar, ThemeToggle, Cursor, SiteFX, ScrollToSection, Experience,
-                          Shots, Tools, SectionHead, Rich, BackToTop, Footer, DocFoot
+  components/             HomeView, Bar, BarClient, CommandPalette, ThemeToggle, Cursor, SiteFX,
+                          ScrollToSection, Experience, Shots, Tools, SectionHead, Rich, BackToTop,
+                          Footer, DocFoot, ProjectArticle, ArchitectureDiagram, ProjectHealth,
+                          AnalyticsTracker
+  app/api/                /api/t (analytics hits) and /api/status (project status)
+  app/go/[code]/          tracking-link redirects
   app/admin/              dashboard pages, server actions, draft-file route
   components/admin/       dashboard UI
   data/profile.ts         validates content/*.json and exports it to pages
   lib/content/schema.ts   content types and validators (shared by build and admin)
   lib/admin/              auth, storage (GitHub / local), upload and résumé checks
-  lib/                    theme, motion, scroll, sections and site-url helpers
+  lib/analytics/          visit recording (Upstash Redis on Vercel, files locally)
+  lib/                    theme, motion, scroll, sections, status, markdown and site-url helpers
   proxy.ts                /admin sign-in gate
 content/                  all site text, links and numbers (JSON)
 ```
