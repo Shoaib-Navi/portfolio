@@ -1570,7 +1570,7 @@ body {
   color: var(--ink);
 }
 
-/* Markdown (case studies and notes). Lists reuse the square bullet from .doc__points. */
+/* Markdown (case studies). Lists reuse the square bullet from .doc__points. */
 .site .md {
   display: grid;
   gap: 1rem;
@@ -1933,41 +1933,6 @@ body {
 .site .health__when {
   font-size: 0.75rem;
   color: var(--ink-subtle);
-}
-
-/* ============================ Notes ============================ */
-.site .note__title {
-  max-width: 22ch;
-  font-size: clamp(2rem, 5.5vw, 3.5rem);
-}
-
-.site .note-row h2 {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.75rem;
-}
-
-.site .note-row__meta {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.8125rem;
-  color: var(--ink-subtle);
-}
-
-.site .note-row .doc__rowno {
-  align-self: start;
-  padding-top: 0.4rem;
-  white-space: nowrap;
-}
-
-.site .doc__empty {
-  margin-top: 2rem;
-  padding: 2rem;
-  text-align: center;
-  color: var(--ink-subtle);
-  border: 1.5px dashed color-mix(in srgb, var(--ink) 25%, transparent);
-  border-radius: var(--radius-card);
 }
 
 /* Architecture diagram: the request path top to bottom, then what runs alongside it. */

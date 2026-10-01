@@ -1,12 +1,10 @@
 import { Fragment, type ReactNode } from "react";
 
-// A deliberately small Markdown subset for case studies and notes, rendered to React
+// A deliberately small Markdown subset for case studies, rendered to React
 // elements (never raw HTML), so content can't inject markup or scripts.
 //
 // Blocks:  ## / ### headings · paragraphs · "- " or "1. " lists · > quotes · ``` code fences
 // Inline:  **bold** · *italic* · `code` · [text](https://… or /path)
-
-export type Heading = { id: string; text: string; level: 2 | 3 };
 
 type Block =
   | { t: "h"; level: 2 | 3; text: string; id: string }
@@ -113,15 +111,6 @@ export function inline(text: string, keyBase = "i"): ReactNode[] {
   }
   if (last < text.length) out.push(text.slice(last));
   return out;
-}
-
-export function headingsOf(src: string): Heading[] {
-  return parseBlocks(src).flatMap((b) => (b.t === "h" ? [{ id: b.id, text: b.text, level: b.level }] : []));
-}
-
-/** Rough reading time at ~220 words a minute, code included. */
-export function readingMinutes(src: string): number {
-  return Math.max(1, Math.round(src.split(/\s+/).filter(Boolean).length / 220));
 }
 
 export function Markdown({ source, className = "md" }: { source: string; className?: string }) {

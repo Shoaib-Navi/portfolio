@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import awards from "../../../content/awards.json";
 import education from "../../../content/education.json";
 import experience from "../../../content/experience.json";
-import notes from "../../../content/notes.json";
 import profile from "../../../content/profile.json";
 import projects from "../../../content/projects.json";
 import resumes from "../../../content/resumes.json";
@@ -10,7 +9,7 @@ import skills from "../../../content/skills.json";
 import stats from "../../../content/stats.json";
 import { COLLECTIONS, parseOrThrow, validate, type CollectionName, type Project } from "./schema";
 
-const real: Record<CollectionName, unknown> = { awards, education, experience, notes, profile, projects, resumes, skills, stats };
+const real: Record<CollectionName, unknown> = { awards, education, experience, profile, projects, resumes, skills, stats };
 
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 

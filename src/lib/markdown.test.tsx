@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { headingsOf, inline, Markdown, parseBlocks, readingMinutes } from "./markdown";
+import { inline, Markdown, parseBlocks } from "./markdown";
 
 const html = (src: string) => renderToStaticMarkup(<Markdown source={src} />);
 
@@ -11,14 +11,6 @@ describe("markdown subset", () => {
     expect(blocks[1]).toEqual({ t: "p", text: "One line." });
     expect(blocks[2]).toEqual({ t: "ul", items: ["a", "b continued"] });
     expect(blocks[5]).toEqual({ t: "code", lang: "sql", text: "SELECT 1;" });
-  });
-
-  it("gives headings unique ids for the table of contents", () => {
-    expect(headingsOf("## Why\n### Setup\n## Why")).toEqual([
-      { id: "why", text: "Why", level: 2 },
-      { id: "setup", text: "Setup", level: 3 },
-      { id: "why-2", text: "Why", level: 2 },
-    ]);
   });
 
   it("renders inline bold, code and safe links only", () => {
@@ -47,10 +39,5 @@ describe("markdown subset", () => {
 
   it("keeps code blocks verbatim (no inline formatting inside)", () => {
     expect(html("```\n**not bold** `x`\n```")).toContain("<code>**not bold** `x`</code>");
-  });
-
-  it("estimates reading time", () => {
-    expect(readingMinutes("word ".repeat(10))).toBe(1);
-    expect(readingMinutes("word ".repeat(880))).toBe(4);
   });
 });

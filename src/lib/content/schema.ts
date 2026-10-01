@@ -157,20 +157,6 @@ export type Project = {
   caseStudy?: CaseStudy;
 };
 export type Education = { title: string; org: string; detail: string };
-export type Note = {
-  slug: string;
-  title: string;
-  summary: string;
-  /** YYYY-MM-DD */
-  date: string;
-  tags: string[];
-  /** Slug of the project the note comes from, if any */
-  project?: string;
-  /** Markdown subset (see lib/markdown.tsx) */
-  body: string;
-  /** Unverified notes are drafts: visible in dev and the admin, never in production. */
-  verified: boolean;
-};
 export type Award = { title: string; detail: string; href?: string; verified: boolean };
 export type ResumeChecks = { pages: number; bytes: number; phone: boolean; textLayer: boolean };
 export type ResumeVersion = { id: string; label: string; file: string; uploadedAt: string; checks: ResumeChecks };
@@ -254,20 +240,6 @@ export const projectsV: V<Project[]> = arr(
   { max: 30 },
 );
 
-export const notesV: V<Note[]> = arr(
-  obj<Note>({
-    slug,
-    title: str({ max: 100 }),
-    summary: str({ max: 280 }),
-    date: str({ pattern: /^\d{4}-\d{2}-\d{2}$/, patternMsg: "YYYY-MM-DD" }),
-    tags: arr(str({ max: 24 }), { max: 6 }),
-    project: opt(slug),
-    body: str({ min: 50, max: 30000 }),
-    verified: bool,
-  }),
-  { max: 100 },
-);
-
 export const educationV: V<Education[]> = arr(
   obj<Education>({ title: str({ max: 80 }), org: str({ max: 120 }), detail: str({ max: 120 }) }),
   { max: 6 },
@@ -312,11 +284,6 @@ const refinements: { [K in keyof Collections]?: Refine<Collections[K]> } = {
     list.forEach((p, i) => p.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
   },
   experience: (list, issues) => uniqueBy(list, (j) => j.slug, "", "slug", issues),
-  notes: (list, issues) => {
-    uniqueBy(list, (n) => n.slug, "", "slug", issues);
-    // /admin/notes/new is the "add note" route.
-    list.forEach((n, i) => n.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
-  },
   skills: (groups, issues) => {
     uniqueBy(groups, (g) => g.label, "", "group", issues);
     uniqueBy(
@@ -341,7 +308,6 @@ export type Collections = {
   skills: SkillGroup[];
   experience: Job[];
   projects: Project[];
-  notes: Note[];
   education: Education[];
   awards: Award[];
   resumes: Resumes;
@@ -354,7 +320,6 @@ const validators: { [K in CollectionName]: V<Collections[K]> } = {
   skills: skillsV,
   experience: experienceV,
   projects: projectsV,
-  notes: notesV,
   education: educationV,
   awards: awardsV,
   resumes: resumesV,

@@ -1,4 +1,4 @@
-import { notes, projects } from "@/data/profile";
+import { projects } from "@/data/profile";
 import { readSessionToken, SESSION_COOKIE } from "@/lib/admin/session";
 import { dayOf, deviceOf, isBot, visitorHash } from "./index";
 import type { Hit } from "./types";
@@ -12,9 +12,7 @@ export function knownPaths(): Set<string> {
     "/experience",
     "/contact",
     "/work",
-    "/notes",
     ...projects.map((p) => `/work/${p.slug}`),
-    ...notes.map((n) => `/notes/${n.slug}`),
   ]);
 }
 
