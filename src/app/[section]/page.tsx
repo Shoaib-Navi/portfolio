@@ -15,7 +15,6 @@ const TITLES: Record<SectionId, string> = {
   about: "About",
   skills: "Toolbox",
   experience: "Experience",
-  engineering: "Engineering",
   contact: "Contact",
 };
 

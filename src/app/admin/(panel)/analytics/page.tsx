@@ -17,7 +17,6 @@ const PAGE_NAMES: Record<string, string> = {
   "/about": "About",
   "/skills": "Skills",
   "/experience": "Experience",
-  "/engineering": "Engineering",
   "/contact": "Contact",
   "/work": "All work",
   "/notes": "All notes",

@@ -41,7 +41,6 @@ export default function AdminNav({
         { href: "/admin/projects", label: "Projects", count: counts.projects },
         { href: "/admin/experience", label: "Experience", count: counts.experience },
         { href: "/admin/skills", label: "Skills", count: counts.skills },
-        { href: "/admin/engineering", label: "Engineering" },
         { href: "/admin/notes", label: "Notes" },
         { href: "/admin/education", label: "Education & awards" },
       ],

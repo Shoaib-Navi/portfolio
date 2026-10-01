@@ -171,9 +171,6 @@ export type Note = {
   /** Unverified notes are drafts: visible in dev and the admin, never in production. */
   verified: boolean;
 };
-/** A concrete, checkable example of a practice. `source` is a project slug, or "site" for this portfolio. */
-export type Evidence = { text: string; source: string };
-export type Practice = { area: string; summary: string; evidence: Evidence[]; verified: boolean };
 export type Award = { title: string; detail: string; href?: string; verified: boolean };
 export type ResumeChecks = { pages: number; bytes: number; phone: boolean; textLayer: boolean };
 export type ResumeVersion = { id: string; label: string; file: string; uploadedAt: string; checks: ResumeChecks };
@@ -257,19 +254,6 @@ export const projectsV: V<Project[]> = arr(
   { max: 30 },
 );
 
-export const practicesV: V<Practice[]> = arr(
-  obj<Practice>({
-    area: str({ max: 30 }),
-    summary: str({ max: 200 }),
-    evidence: arr(obj<Evidence>({ text: text(300), source: str({ max: 60, pattern: SLUG, patternMsg: "A project slug or “site”" }) }), {
-      min: 1,
-      max: 6,
-    }),
-    verified: bool,
-  }),
-  { max: 12 },
-);
-
 export const notesV: V<Note[]> = arr(
   obj<Note>({
     slug,
@@ -328,7 +312,6 @@ const refinements: { [K in keyof Collections]?: Refine<Collections[K]> } = {
     list.forEach((p, i) => p.slug === "new" && issues.push({ path: `[${i}].slug`, message: "“new” is reserved" }));
   },
   experience: (list, issues) => uniqueBy(list, (j) => j.slug, "", "slug", issues),
-  practices: (list, issues) => uniqueBy(list, (p) => p.area, "", "area", issues),
   notes: (list, issues) => {
     uniqueBy(list, (n) => n.slug, "", "slug", issues);
     // /admin/notes/new is the "add note" route.
@@ -358,7 +341,6 @@ export type Collections = {
   skills: SkillGroup[];
   experience: Job[];
   projects: Project[];
-  practices: Practice[];
   notes: Note[];
   education: Education[];
   awards: Award[];
@@ -372,7 +354,6 @@ const validators: { [K in CollectionName]: V<Collections[K]> } = {
   skills: skillsV,
   experience: experienceV,
   projects: projectsV,
-  practices: practicesV,
   notes: notesV,
   education: educationV,
   awards: awardsV,

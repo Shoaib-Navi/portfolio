@@ -10,7 +10,6 @@ export function knownPaths(): Set<string> {
     "/about",
     "/skills",
     "/experience",
-    "/engineering",
     "/contact",
     "/work",
     "/notes",

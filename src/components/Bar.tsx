@@ -24,7 +24,6 @@ const palette: PaletteItem[] = [
   { id: "s-about", group: "Sections", label: "About", kind: "page", href: "/about" },
   { id: "s-skills", group: "Sections", label: "Skills", hint: "Toolbox", kind: "page", href: "/skills", keywords: "toolbox stack technologies" },
   { id: "s-experience", group: "Sections", label: "Experience", kind: "page", href: "/experience", keywords: "internship work history" },
-  { id: "s-engineering", group: "Sections", label: "Engineering", hint: "Testing, CI/CD, security…", kind: "page", href: "/engineering", keywords: "testing ci cd architecture performance accessibility security infrastructure" },
   { id: "s-work", group: "Sections", label: "All work", kind: "page", href: "/work", keywords: "projects" },
   ...(notes.length ? [{ id: "s-notes", group: "Sections", label: "All notes", kind: "page" as const, href: "/notes", keywords: "articles blog writing" }] : []),
   { id: "s-contact", group: "Sections", label: "Contact", kind: "page", href: "/contact" },

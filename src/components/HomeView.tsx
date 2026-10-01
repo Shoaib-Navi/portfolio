@@ -2,7 +2,6 @@ import Link from "next/link";
 import ScrollToSection from "@/components/ScrollToSection";
 import type { SectionId } from "@/lib/sections";
 import Bar from "@/components/Bar";
-import Engineering from "@/components/Engineering";
 import Experience from "@/components/Experience";
 import SectionHead from "@/components/SectionHead";
 import Tools from "@/components/Tools";
@@ -213,8 +212,6 @@ export default function HomeView({ section }: { section?: SectionId }) {
             </div>
           </div>
         </section>
-
-        <Engineering />
 
         <section>
           <div className="wrap">
