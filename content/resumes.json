@@ -1,15 +1,15 @@
 {
-  "live": "2026-09-20-resume-8",
+  "live": "2026-10-02-resume-9",
   "versions": [
     {
-      "id": "2026-09-20-resume-8",
-      "label": "Resume-8",
-      "file": "/resumes/2026-09-20-resume-8.pdf",
-      "uploadedAt": "2026-09-20T02:48:50+05:30",
+      "id": "2026-10-02-resume-9",
+      "label": "Resume-9",
+      "file": "/resumes/2026-10-02-resume-9.pdf",
+      "uploadedAt": "2026-10-02T02:41:52+05:30",
       "checks": {
         "pages": 1,
-        "bytes": 166344,
-        "phone": true,
+        "bytes": 229310,
+        "phone": false,
         "textLayer": true
       }
     }
