@@ -56,11 +56,11 @@
       "sections": [
         {
           "heading": "Problem",
-          "body": "Outpatient clinics run on a daily patient queue. One visit moves through registration, the live queue, vitals, consultation, lab orders and results, prescriptions and pharmacy dispensing, and each step belongs to a different person: receptionist, nurse, doctor, lab technician, pharmacist. CarePulse gives every role its own workflow on one shared patient record, for several clinics at once.\n\nThree things make that harder than a typical CRUD app:\n\n- **Concurrency.** Two receptionists registering patients at the same moment must never get the same queue token.\n- **Isolation.** Clinics share one database, and one clinic must never see another clinic's patients.\n- **Trust.** Clinical records can't be quietly overwritten, and every read of patient data has to be accountable."
+          "body": "Outpatient clinics run on a daily patient queue. One visit moves through registration, the live queue, vitals, consultation, lab orders and results, prescriptions and pharmacy dispensing, and each step belongs to a different person: receptionist, nurse, doctor, lab technician, pharmacist. With the clinic administrator, that makes six staff roles, and CarePulse gives each one its own workflow on one shared patient record, for several clinics at once.\n\nThree things make that harder than a typical CRUD app:\n\n- **Concurrency.** Two receptionists registering patients at the same moment must never get the same queue token.\n- **Isolation.** Clinics share one database, and one clinic must never see another clinic's patients.\n- **Trust.** Clinical records can't be quietly overwritten, and every read of patient data has to be accountable."
         },
         {
           "heading": "Approach",
-          "body": "CarePulse is built by a team of two: a Python backend on FastAPI and PostgreSQL, and a React and TypeScript front end.\n\nTests were part of the design from the first week rather than something added at the end. The goal was simple: if the suite passes, a clinic's day actually works, including the parts that only break under concurrent use."
+          "body": "CarePulse is built by a team of two: a Python backend on FastAPI and PostgreSQL, and a React and TypeScript front end.\n\nTests have been in the repository since its first commit rather than added at the end. The goal was simple: if the suite passes, a clinic's day actually works, including the parts that only break under concurrent use."
         },
         {
           "heading": "Architecture",

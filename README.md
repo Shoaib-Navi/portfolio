@@ -46,7 +46,9 @@ you press **Publish**, which writes every pending change as one commit.
 
 1. `npm run admin:hash -- "a long password"` prints `ADMIN_PASSWORD_HASH` and `SESSION_SECRET`.
 2. Put them, plus `ADMIN_USER`, in `.env.local` (see `.env.example`) and open
-   http://localhost:3000/admin.
+   http://localhost:3000/admin. In `.env.local`, write every `$` in the hash as `\$`: Next.js
+   expands `$NAME` in env files, and an unescaped hash turns into a value that never matches,
+   so sign-in fails with "Invalid user name or password".
 3. For production, add the same three to the Vercel project, plus `GITHUB_TOKEN` (fine-grained PAT,
    this repo only, *Contents: read and write*, optionally *Commit statuses: read*) and `GITHUB_REPO`.
 

@@ -66,7 +66,7 @@ export function TrackingLinks({
       <div className="card__head">
         <h2>Tracking links</h2>
         <p>
-          One link per application: put it on that résumé, email or form. It can open your home page, a project, a note, or the
+          One link per application: put it on that résumé, email or form. It can open your home page, a project, or the
           résumé PDF directly, and every visit through it is credited here.
         </p>
       </div>
