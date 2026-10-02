@@ -3,7 +3,7 @@
     "slug": "carepulse",
     "name": "CarePulse",
     "tagline": "Multi-tenant hospital management system",
-    "status": "Ongoing · Team of 2",
+    "status": "Ongoing · Solo project",
     "lede": "Clinic system for India covering outpatient visits (registration, live queue, vitals, consultation, lab orders and results, prescriptions, pharmacy dispensing), inpatient admissions and billing, for 6 staff roles.",
     "stack": [
       "Python",
@@ -60,7 +60,7 @@
         },
         {
           "heading": "Approach",
-          "body": "CarePulse is built by a team of two: a Python backend on FastAPI and PostgreSQL, and a React and TypeScript front end.\n\nTests have been in the repository since its first commit rather than added at the end. The goal was simple: if the suite passes, a clinic's day actually works, including the parts that only break under concurrent use."
+          "body": "CarePulse is a solo project: a Python backend on FastAPI and PostgreSQL, and a React and TypeScript front end.\n\nTests have been in the repository since its first commit rather than added at the end. The goal was simple: if the suite passes, a clinic's day actually works, including the parts that only break under concurrent use."
         },
         {
           "heading": "Architecture",
