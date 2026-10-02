@@ -52,7 +52,7 @@
     ],
     "verified": true,
     "caseStudy": {
-      "verified": false,
+      "verified": true,
       "sections": [
         {
           "heading": "Problem",
