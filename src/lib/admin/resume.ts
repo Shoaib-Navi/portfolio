@@ -12,7 +12,7 @@ export async function extractPdfText(bytes: Uint8Array): Promise<{ pages: number
   return { pages: totalPages, text };
 }
 
-// +91 99975 69431, (+91) 9997569431, 999-756-9431 … at least 10 digits in a phone-like run.
+// +91 98765 43210, (+91) 9876543210, 987-654-3210 … at least 10 digits in a phone-like run.
 const PHONE = /(?:\+|\(\+)?\d[\d\s().-]{8,}\d/g;
 
 export function findPhone(text: string): string | null {

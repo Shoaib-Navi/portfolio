@@ -4,7 +4,7 @@
     "name": "CarePulse",
     "tagline": "Multi-tenant hospital management system",
     "status": "Ongoing · Team of 2",
-    "lede": "Outpatient system for Indian clinics covering registration, live queue, vitals, consultation, lab orders and results, prescriptions and pharmacy dispensing for 6 staff roles.",
+    "lede": "Clinic system for India covering outpatient visits (registration, live queue, vitals, consultation, lab orders and results, prescriptions, pharmacy dispensing), inpatient admissions and billing, for 6 staff roles.",
     "stack": [
       "Python",
       "FastAPI",
@@ -18,7 +18,7 @@
     "points": [
       {
         "label": "Backend",
-        "text": "**185 REST API operations** in Python / FastAPI across 36 feature modules, each built as router, service and repository layers with SQLAlchemy 2.0 and Alembic migrations."
+        "text": "**185 REST API operations** in Python / FastAPI across 36 feature modules, built as router, service and repository layers with SQLAlchemy 2.0 and Alembic migrations."
       },
       {
         "label": "Data & multi-tenancy",
@@ -65,7 +65,7 @@
         {
           "heading": "Architecture",
           "diagram": true,
-          "body": "The API has **185 operations across 36 feature modules**, and every module is split the same way, so each new feature has an obvious home:\n\n- **Router**: the HTTP layer.\n- **Service**: the business rules.\n- **Repository**: data access through SQLAlchemy 2.0, with schema changes as Alembic migrations.\n\nPostgreSQL does more than store rows. It enforces tenant isolation, keeps clinical history append-only, and coordinates background work."
+          "body": "The API has **185 operations across 36 feature modules**, and the modules follow the same split, so each new feature has an obvious home:\n\n- **Router**: the HTTP layer.\n- **Service**: the business rules.\n- **Repository**: data access through SQLAlchemy 2.0, with schema changes as Alembic migrations.\n\nPostgreSQL does more than store rows. It enforces tenant isolation, keeps clinical history append-only, and coordinates background work."
         },
         {
           "heading": "Technical decisions",
@@ -81,7 +81,7 @@
         },
         {
           "heading": "Results",
-          "body": "- **185 REST API operations** across 36 feature modules, covering six staff roles. An operation is one method and path in the OpenAPI spec.\n- **925 pytest tests**, counted as pytest collects them: 336 unit, 300 integration on real PostgreSQL and 289 security, plus Hypothesis property tests and Playwright end-to-end runs.\n- **p95 patient search under 300 ms** with 50,000 patients, asserted by a test.\n- Every push runs pytest, ruff, strict mypy, ESLint, dependency audits and Docker builds in **GitHub Actions**.\n\nCarePulse is still in progress, so these figures are a snapshot from October 2026. The repository is private."
+          "body": "- **185 REST API operations** across 36 feature modules, covering six staff roles. An operation is one method and path in the OpenAPI spec.\n- **925 pytest tests**, counted as pytest collects them: 336 unit, 300 integration on real PostgreSQL and 289 security, plus Hypothesis property tests and Playwright end-to-end runs.\n- **p95 patient search under 300 ms** with 50,000 patients, asserted by a test.\n- Every push to main and every pull request runs pytest, ruff, strict mypy, ESLint, dependency audits and Docker builds in **GitHub Actions**.\n\nCarePulse is still in progress, so these figures are a snapshot from October 2026. The repository is private."
         },
         {
           "heading": "Lessons learned",

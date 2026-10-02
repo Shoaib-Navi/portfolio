@@ -32,12 +32,12 @@ const goodText = [
 ].join("\n");
 
 describe("findPhone", () => {
-  it.each(["(+91) 9997569431", "+91 99975 69431", "Call 999-756-9431 anytime"])("flags %s", (s) => {
+  it.each(["(+91) 9876543210", "+91 98765 43210", "Call 987-654-3210 anytime"])("flags %s", (s) => {
     expect(findPhone(s)).not.toBeNull();
   });
 
   it("returns the matched number", () => {
-    expect(findPhone("Phone: (+91) 9997569431 | Email")).toBe("(+91) 9997569431");
+    expect(findPhone("Phone: (+91) 9876543210 | Email")).toBe("(+91) 9876543210");
   });
 
   it.each(["2023–2027", "2021 2023", "2021 2023 2025", "CGPA 8.05", "354 problems", "Jan 2021 - Mar 2023"])(
@@ -55,7 +55,7 @@ describe("findPhone", () => {
 describe("resumeChecks", () => {
   it("reports phone and text layer", () => {
     expect(resumeChecks(1, goodText, 1234)).toEqual({ pages: 1, bytes: 1234, phone: false, textLayer: true });
-    expect(resumeChecks(2, "(+91) 9997569431", 10)).toEqual({ pages: 2, bytes: 10, phone: true, textLayer: false });
+    expect(resumeChecks(2, "(+91) 9876543210", 10)).toEqual({ pages: 2, bytes: 10, phone: true, textLayer: false });
   });
 });
 
@@ -65,10 +65,10 @@ describe("consistency", () => {
   });
 
   it("flags a phone number as an error", () => {
-    const findings = consistency(`${goodText}\n+91 99975 69431`, data());
+    const findings = consistency(`${goodText}\n+91 98765 43210`, data());
     expect(findings).toHaveLength(1);
     expect(findings[0]).toMatchObject({ level: "error", href: "/admin/resume" });
-    expect(findings[0].text).toMatch(/phone number \(\+91 9997…\)/);
+    expect(findings[0].text).toMatch(/phone number \(\+91 9876…\)/);
   });
 
   it("flags a missing text layer", () => {
