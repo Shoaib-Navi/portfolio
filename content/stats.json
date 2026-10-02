@@ -1,0 +1,23 @@
+[
+  {
+    "value": "8.05",
+    "label": "CGPA",
+    "count": 8.05,
+    "dec": 2
+  },
+  {
+    "value": "368",
+    "label": "LeetCode problems",
+    "count": 368
+  },
+  {
+    "value": "1,709",
+    "label": "Peak contest rating",
+    "count": 1709,
+    "group": true
+  },
+  {
+    "value": "1st",
+    "label": "SIH 2025 (internal)"
+  }
+]

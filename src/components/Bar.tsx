@@ -1,13 +1,10 @@
-"use client";
+import BarClient, { type NavItem } from "./BarClient";
+import CommandPalette, { type PaletteItem } from "./CommandPalette";
+import { profile, projects } from "@/data/profile";
 
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import Link from "next/link";
-import ThemeToggle from "./ThemeToggle";
-import { profile } from "@/data/profile";
-import { useScrollPast } from "@/lib/useScrollPast";
-
-const NAV = [
+// Server half of the bar: reads content here so the client bundle gets only these few
+// strings (nav links and palette entries), not every content file.
+const nav: NavItem[] = [
   { href: "/about", label: "About" },
   { href: "/skills", label: "Skills" },
   { href: "/experience", label: "Experience" },
@@ -15,105 +12,30 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
+const palette: PaletteItem[] = [
+  ...projects.flatMap((p): PaletteItem[] => [
+    { id: `p-${p.slug}`, group: "Projects", label: p.name, hint: p.tagline, kind: "page", href: `/work/${p.slug}`, keywords: p.stack.join(" ") },
+    ...(p.caseStudy
+      ? [{ id: `cs-${p.slug}`, group: "Projects", label: `${p.name} case study`, hint: "Architecture, decisions, trade-offs", kind: "page" as const, href: `/work/${p.slug}#case-study` }]
+      : []),
+  ]),
+  { id: "s-about", group: "Sections", label: "About", kind: "page", href: "/about" },
+  { id: "s-skills", group: "Sections", label: "Skills", hint: "Toolbox", kind: "page", href: "/skills", keywords: "toolbox stack technologies" },
+  { id: "s-experience", group: "Sections", label: "Experience", kind: "page", href: "/experience", keywords: "internship work history" },
+  { id: "s-work", group: "Sections", label: "All work", kind: "page", href: "/work", keywords: "projects" },
+  { id: "s-contact", group: "Sections", label: "Contact", kind: "page", href: "/contact" },
+  { id: "a-resume", group: "Actions", label: "Download résumé", hint: "PDF", kind: "download", href: profile.resume, keywords: "cv resume pdf" },
+  { id: "a-email", group: "Actions", label: "Email me", hint: profile.email, kind: "page", href: `mailto:${profile.email}`, keywords: "contact mail" },
+  { id: "a-copy", group: "Actions", label: "Copy email address", hint: profile.email, kind: "copy", href: profile.email, keywords: "contact mail clipboard" },
+  { id: "a-theme", group: "Actions", label: "Switch light / dark theme", kind: "theme", keywords: "dark mode light mode appearance" },
+  ...profile.links.map((l): PaletteItem => ({ id: `l-${l.label.toLowerCase()}`, group: "Profiles", label: l.label, hint: l.href.replace(/^https:\/\/(www\.)?/, ""), kind: "external", href: l.href })),
+];
+
 export default function Bar({ back }: { back?: { href: string; label: string } }) {
-  const [open, setOpen] = useState(false);
-  // The drawer is portalled into the .site root, not <body>, so it keeps the site's styles.
-  const [root, setRoot] = useState<HTMLElement | null>(null);
-  const bar = useRef<HTMLElement>(null);
-  const burger = useRef<HTMLButtonElement>(null);
-  const stuck = useScrollPast(8);
-
-  useEffect(() => setRoot(bar.current?.closest<HTMLElement>(".site") ?? null), []);
-
-  useEffect(() => {
-    if (!open) {
-      document.documentElement.removeAttribute("data-drawer");
-      return;
-    }
-    document.documentElement.setAttribute("data-drawer", "1");
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        burger.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.documentElement.removeAttribute("data-drawer");
-    };
-  }, [open]);
-
   return (
-    <header ref={bar} className="bar" data-stuck={stuck ? "1" : "0"}>
-      <Link className="mark" href="/" aria-label="Home">
-        {profile.initials}
-      </Link>
-
-      {back ? (
-        <Link className="bar__back" href={back.href}>
-          <span aria-hidden>←</span>
-          <span>{back.label}</span>
-        </Link>
-      ) : (
-        <nav aria-label="Sections">
-          {NAV.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      <ThemeToggle />
-
-      <a className="bar__cta" href={profile.resume} download>
-        <span>Résumé</span>
-        <span className="long"> PDF ↓</span>
-      </a>
-
-      {!back && (
-        <button
-          ref={burger}
-          type="button"
-          className="burger"
-          aria-expanded={open}
-          aria-controls="site-drawer"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span aria-hidden />
-          <span aria-hidden />
-          <span aria-hidden />
-        </button>
-      )}
-
-      {root && !back
-        ? createPortal(
-            <div className="drawer__root" data-open={open ? "1" : "0"}>
-              <button
-                type="button"
-                className="drawer__scrim"
-                tabIndex={-1}
-                aria-hidden
-                onClick={() => setOpen(false)}
-              />
-              <div id="site-drawer" className="drawer" hidden={!open}>
-                <nav className="drawer__links" aria-label="Sections">
-                  {NAV.map((item) => (
-                    <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
-                <a className="bar__cta" href={profile.resume} download onClick={() => setOpen(false)}>
-                  Résumé PDF ↓
-                </a>
-              </div>
-            </div>,
-            root,
-          )
-        : null}
-    </header>
+    <>
+      <BarClient back={back} initials={profile.initials} resume={profile.resume} nav={nav} />
+      <CommandPalette items={palette} />
+    </>
   );
 }

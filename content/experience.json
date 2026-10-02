@@ -1,0 +1,15 @@
+[
+  {
+    "slug": "ethara",
+    "company": "Ethara AI",
+    "role": "LLM Post-Training Intern",
+    "period": "Apr 2026 – May 2026",
+    "year": "2026",
+    "highlights": [
+      "Evaluated LLM responses against **structured rubrics** for correctness, instruction following and response quality.",
+      "Performed structured testing, benchmarking and feedback analysis to evaluate model responses and **identify performance gaps**."
+    ],
+    "stack": [],
+    "verified": true
+  }
+]

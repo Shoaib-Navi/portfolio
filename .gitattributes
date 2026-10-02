@@ -1,0 +1,2 @@
+# Content is written by the admin with LF endings; keep checkouts identical so diffs stay clean.
+content/*.json text eol=lf
